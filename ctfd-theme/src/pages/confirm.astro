@@ -1,0 +1,19 @@
+---
+import Layout from '@/layouts/Base.astro';
+import ConfirmForm from '@/components/ConfirmForm.svelte';
+---
+<Layout title="Confirm Email">
+  <div class="flex flex-col items-center justify-center h-full font-mono">
+    <div class="panel flex flex-col max-w-prose items-center text-center">
+      <h1 class="font-display-mono font-bold text-2xl mb-2">Confirm Email</h1>
+      <p>Please check your email for a confirmation link to complete your registration.</p>
+      <p>If you haven't received an email, please check your spam folder or contact an admin.</p>
+
+      <div class="flex flex-col items-center text-center mt-4 mb-4">
+        <ConfirmForm client:load />
+      </div>
+
+      <a href="/profile" class="underline hover:text-surface-000 hover:bg-text">Change email address</a>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,27 @@
+name: Launch Sequence
+author: 32121
+category: rev
+description: |-
+  All systems ready for launch, captain. You just need to input the passcode.
+
+  What do you mean you lost it? Wait, are you playing games?? How did you even get that on here???
+
+  Flag format is `uiuctf{<numbers after countdown>}` e.g. `uiuctf{0123456789}`
+
+  **author**: 32121
+value: 500
+type: dynamic
+tags:
+  - hard
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{10646241304546277777364163222041542440404502235062}
+  - uiuctf{106462413045462777773641632220415424404045022350620000000000}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"
+files:
+  - ./main.agc

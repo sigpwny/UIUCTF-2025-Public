@@ -1,0 +1,1 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1.34em" height="1em" viewBox="0 0 640 480" {...$$props}><!-- Icon from Flag Icons by Panayiotis Lipiridis - https://github.com/lipis/flag-icons/blob/main/LICENSE --><path fill="#006a4e" d="M0 0h640v480H0z"/><circle cx="280" cy="240" r="160" fill="#f42a41"/></svg>

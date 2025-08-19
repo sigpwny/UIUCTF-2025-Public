@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block content %}
+<div class="panel p-4 rounded">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-text-primary">Active Shipments</h2>
+    <a
+      href="/new_shipment"
+      class="btn-retro px-4 py-2 rounded text-sm transition-all"
+    >
+      New Shipment
+    </a>
+  </div>
+
+  <div class="panel-inset p-3 rounded">
+    <div class="space-y-3">
+      {% for shipment in shipments %}
+      <div class="shipment-card rounded p-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <h3 class="font-bold text-lg text-text-primary mb-2">
+              {{ shipment.id }}
+            </h3>
+            <div class="space-y-1 text-sm text-text-secondary">
+              <div><strong>From:</strong> {{ shipment.origin }}</div>
+              <div><strong>To:</strong> {{ shipment.destination }}</div>
+              <div><strong>Vessel:</strong> {{ shipment.vessel }}</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="space-y-1 text-sm text-text-secondary">
+              <div><strong>Supplies:</strong> {{ shipment.supply_type }}</div>
+              <div><strong>Weight:</strong> {{ shipment.weight }}</div>
+              <div><strong>Departure:</strong> {{ shipment.departure }}</div>
+              <div><strong>Arrival:</strong> {{ shipment.arrival }}</div>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <div class="mb-3">
+              <span
+                class="status-indicator status-{{ shipment.status.lower().replace(' ', '-') }}"
+              ></span>
+              <span class="font-bold text-text-primary"
+                >{{ shipment.status }}</span
+              >
+            </div>
+            <div class="priority-{{ shipment.priority.lower() }}">
+              Priority: {{ shipment.priority }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-4 text-center text-text-secondary text-sm">
+    <p>Total Active Shipments: {{ shipments|length }} | System Uptime: 99.7%</p>
+  </div>
+</div>
+{% endblock %}

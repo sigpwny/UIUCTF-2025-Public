@@ -1,0 +1,16 @@
+---
+import Layout from '@/layouts/Base.astro';
+import TeamList from '@/components/TeamList.svelte';
+
+// TODO: Get id query parameter and display team
+// const team_id = Astro.url.searchParams.get('team_id') || '';
+// const user_id = Astro.url.searchParams.get('user_id') || '';
+---
+<Layout
+  title="Fleet"
+>
+  <section id="crews" class="panel flex flex-col grow overflow-y-auto custom-scrollbar">
+    <h1 class="font-display-mono font-bold uppercase text-2xl">Crews</h1>
+    <TeamList client:load />
+  </section>
+</Layout>

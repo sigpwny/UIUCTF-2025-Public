@@ -1,0 +1,25 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Mr. Blue Sky
+author: Emma
+category: osint
+description: |-
+  Mr. Blue Sky is your average go-lucky BlueSky user, but is there something more to his profile? See if you can find anything on [his profile](https://bsky.app/profile/mrbluesky1989.bsky.social)
+
+  This is the introduction to an OSINT suite. While all other OSINT challenges can be performed in any order, I recommend starting here.
+
+  **author**: Emma
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{y0u_dr0pp3d_y0ur_cr0wn_k1ngf15h3r_132323098}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

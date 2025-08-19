@@ -1,0 +1,4 @@
+node_modules/
+.env.local
+challenge/app/.next/
+challenge/app/next-env.d.ts

@@ -1,0 +1,26 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: back to roots
+author: epistemologist
+category: crypto
+description: |-
+  I don't think you can predict my secret number from just its square root - can you prove me wrong?
+
+  **author**: epistemologist
+value: 500
+type: dynamic
+tags:
+  - medium
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{SQu4Re_Ro0T5_AR3nT_R4nD0M}
+files:
+  - chal.py
+  - output.txt
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

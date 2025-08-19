@@ -1,0 +1,35 @@
+#!/bin/sh
+
+mkdir -p /proc /sys /tmp
+
+mount -t devtmpfs devtmpfs /dev
+mkdir /dev/pts
+mount -t devpts none /dev/pts
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t tmpfs none /tmp
+
+mkdir /mnt
+if mount -t 9p -o trans=virtio flag /mnt; then
+    cp /mnt/flag.txt /flag.txt
+    umount /mnt
+else
+    echo 'uiuctf{test_flag}' > /flag.txt
+fi
+
+chown 0:0 /flag.txt
+chmod 0400 flag.txt
+
+
+
+cat <<!
+
+Welcome to baby-kernel!
+Boot took $(cut -d' ' -f1 /proc/uptime) seconds
+
+!
+
+insmod vuln.ko
+chmod 0666 /dev/vuln
+
+exec setsid cttyhack setuidgid 1000 /bin/sh 0<>"/dev/ttyS0" 1>&0 2>&0

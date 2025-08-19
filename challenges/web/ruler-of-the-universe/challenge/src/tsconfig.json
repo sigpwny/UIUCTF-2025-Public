@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "types": ["bun-types"],
+    "jsx": "react-jsxdev",
+    "jsxImportSource": "my_jsx",
+    "baseUrl": "."
+  }
+}

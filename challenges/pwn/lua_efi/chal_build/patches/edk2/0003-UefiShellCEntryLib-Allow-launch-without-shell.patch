@@ -1,0 +1,28 @@
+From 89c9f49fd98898aaf315bcbb1f674ec3378e15e2 Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Fri, 4 Jul 2025 17:18:47 -0700
+Subject: [PATCH 3/3] UefiShellCEntryLib: Allow launch without shell
+
+It will be assumed to have no arguments.
+
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.c b/ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.c
+index 17e48443ac..70d3c09bc4 100644
+--- a/ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.c
++++ b/ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.c
+@@ -88,7 +88,7 @@ ShellCEntryLib (
+                          EfiShellInterface->Argv
+                          );
+     } else {
+-      ASSERT (FALSE);
++      ReturnFromMain = ShellAppMain (0, NULL);
+     }
+   }
+ 
+-- 
+2.50.0
+

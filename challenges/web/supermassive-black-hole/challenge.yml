@@ -1,0 +1,27 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Supermassive Black Hole
+author: Emma
+category: web
+description: |-
+  Black Hole Ticketing Services prides itself on losing tickets at the speed of light. Can you get them to escalate?
+
+  Instancer url: https://supermassive-black-hole.chal.uiuc.tf/
+
+  **author**: Emma
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{7h15_c0uld_h4v3_b33n_4_5l4ck_m355463_8091732490}
+files:
+  - handouts/handout.tar.gz
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

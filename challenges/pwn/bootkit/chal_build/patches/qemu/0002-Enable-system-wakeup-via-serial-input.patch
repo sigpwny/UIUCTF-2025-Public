@@ -1,0 +1,40 @@
+From 8385290dc9aa2590c304cd19a8a50971ba1196b1 Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Sun, 29 Jun 2025 15:00:45 -0700
+Subject: [PATCH 2/2] Enable system wakeup via serial input
+
+Signed-off-by: YiFei Zhu <zhuyifei1999@gmail.com>
+---
+ hw/char/serial.c  | 2 +-
+ system/runstate.c | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 70044e14a0..771a282896 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -967,7 +967,7 @@ const MemoryRegionOps serial_io_ops = {
+ static const Property serial_properties[] = {
+     DEFINE_PROP_CHR("chardev", SerialState, chr),
+     DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+-    DEFINE_PROP_BOOL("wakeup", SerialState, wakeup, false),
++    DEFINE_PROP_BOOL("wakeup", SerialState, wakeup, true),
+ };
+ 
+ static void serial_class_init(ObjectClass *klass, void* data)
+diff --git a/system/runstate.c b/system/runstate.c
+index 272801d307..0dff776a08 100644
+--- a/system/runstate.c
++++ b/system/runstate.c
+@@ -641,6 +641,8 @@ void qemu_system_reset_request(ShutdownCause reason)
+ 
+ static void qemu_system_suspend(void)
+ {
++    fprintf(stdout, "VM suspended. Press enter to resume...\n");
++    fflush(stdout);
+     pause_all_vcpus();
+     notifier_list_notify(&suspend_notifiers, NULL);
+     runstate_set(RUN_STATE_SUSPENDED);
+-- 
+2.50.0
+

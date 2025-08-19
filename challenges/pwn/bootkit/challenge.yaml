@@ -1,0 +1,58 @@
+apiVersion: kctf.dev/v1
+kind: Challenge
+metadata:
+  name: bootkit
+spec:
+  deployed: true
+  powDifficultySeconds: 0
+  network:
+    public: false
+    ports:
+      - protocol: "TCP"
+        port: 1337
+        targetPort: 1337
+  healthcheck:
+    enabled: true
+    image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/bootkit-healthcheck:b759aebdea35db479599ba1004bed3c5a7655984e5b6d97f168c9fec850f013d
+  image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/bootkit-challenge:d235f6d8cc5ac1fd47fefbaf76ca96d021e0016e6a7e860f38df6269fec60c60
+  podTemplate:
+    template:
+      spec:
+        containers:
+          - name: challenge
+            livenessProbe:
+              failureThreshold: 4
+              httpGet:
+                path: /healthz
+                port: 45281
+                scheme: HTTP
+              periodSeconds: 120
+              successThreshold: 1
+              timeoutSeconds: 3
+            startupProbe:
+              failureThreshold: 20
+              httpGet:
+                path: /healthz
+                port: 45281
+                scheme: HTTP
+              initialDelaySeconds: 200
+              periodSeconds: 5
+              successThreshold: 1
+              timeoutSeconds: 3
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: bootkit
+  labels:
+    app: bootkit
+spec:
+  entryPoints:
+    - tcp
+  routes:
+    - match: HostSNI(`bootkit.chal.uiuc.tf`)
+      services:
+        - name: bootkit
+          port: 1337
+  tls:
+    secretName: tls-cert

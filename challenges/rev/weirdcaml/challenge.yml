@@ -1,0 +1,24 @@
+name: weirdcaml
+author: n8
+category: rev
+description: |
+  Compile this OCaml file with `ocamlc main.ml`. The flag will be printed to stderr!
+
+  You'll need to wrap the flag in uiuctf{} when you submit.
+
+  **author**: n8
+value: 500
+type: dynamic
+tags:
+  - ocaml
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{sat_on_a_caml}
+  - sat_on_a_caml
+state: visible
+version: "0.1"
+files:
+  - main.ml

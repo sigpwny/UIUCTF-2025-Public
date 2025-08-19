@@ -1,0 +1,34 @@
+apiVersion: kctf.dev/v1
+kind: Challenge
+metadata:
+  name: baby-kernel
+spec:
+  deployed: true
+  powDifficultySeconds: 0
+  network:
+    public: false
+    ports:
+      - protocol: "TCP"
+        port: 1337
+        targetPort: 1337
+  healthcheck:
+    enabled: true
+    image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/baby-kernel-healthcheck:acf7956c6ec94bc82f1a041bca9a83e7c29eb143227676ea09d6f23a53211587
+  image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/baby-kernel-challenge:c526ef550a5eaca1f9ce370459f9bb74fabcafef95a760cf613920bff37bae98
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: baby-kernel
+  labels:
+    app: baby-kernel
+spec:
+  entryPoints:
+    - tcp
+  routes:
+    - match: HostSNI(`baby-kernel.chal.uiuc.tf`)
+      services:
+        - name: baby-kernel
+          port: 1337
+  tls:
+    secretName: tls-cert

@@ -1,0 +1,11 @@
+---
+import Layout from '@/layouts/Base.astro';
+import Scoreboard from '@/components/Scoreboard.svelte';
+---
+<Layout
+  title="Scoreboard"
+>
+  <section id="scoreboard" class="panel flex flex-col grow overflow-y-scroll custom-scrollbar">
+    <Scoreboard client:load />
+  </section>
+</Layout>

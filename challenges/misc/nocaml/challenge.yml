@@ -1,0 +1,28 @@
+name: nocaml
+author: n8
+category: misc
+description: |
+  How to read files without the standard library? 🐪🤔
+
+  For weird infra reasons unrelated to actual solve, here's the gnarly command to test your solution:
+
+  `(base64 -w0 your-solution.ml; echo) | ncat --no-shutdown --ssl nocaml.chal.uiuc.tf 1337`
+
+  **author**: n8
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{nocaml_79976241e31bee31e37c42885}
+tags:
+  - ocaml
+files:
+  - challenge/nocaml.ml
+  - challenge/go.sh
+  - challenge/Dockerfile
+  - challenge/nsjail.cfg
+state: visible
+version: "0.1"

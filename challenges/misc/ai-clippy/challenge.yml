@@ -1,0 +1,28 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: ai-clippy
+author: ian5v, bazumo, minh
+category: misc
+description: |-
+  You find a space station Terminal that seems abandoned.
+
+  Challenge url: https://ai-clippy.chal.uiuc.tf/
+
+  **author**: ian5v, bazumo, minh
+value: 500
+type: dynamic
+tags:
+  - easy
+  - ai
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{its_only_mcp_if_its_from_the_montpellier_castres_perpignan_region_of_france_otherwise_its_just_sparkling_jsonrpc}
+files:
+  - handouts/handout.tar.gz
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

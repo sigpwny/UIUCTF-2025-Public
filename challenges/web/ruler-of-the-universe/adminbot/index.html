@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Bot</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body
+    class="bg-black text-green-400 font-mono flex items-center justify-center min-h-screen"
+  >
+    <div class="w-full max-w-lg p-6 pb-12">
+      <header class="mb-6 text-center">
+        <h1 class="text-3xl text-blue-400 tracking-widest">ADMIN BOT PANEL</h1>
+        <p class="text-sm text-blue-300">
+          Enter a URL for the admin bot to visit...
+        </p>
+      </header>
+      <main class="bg-gray-900 p-6 rounded-lg border border-blue-700">
+        <h2 class="text-lg text-blue-400 border-b border-blue-500 pb-2 mb-4">
+          Submit URL
+        </h2>
+        <form class="flex flex-col gap-4">
+          <label class="text-sm">
+            Enter URL:
+            <div class="flex items-center">
+              <span
+                class="bg-black text-blue-400 px-2 py-2 border border-blue-500 rounded-l select-none"
+                title="The main page is running on http://localhost:3000 from the admin bot's perspective"
+                >http://localhost:3000/</span
+              >
+              <input
+                type="text"
+                class="block w-full p-2 bg-black border-t border-b border-r border-blue-500 text-blue-300 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder=""
+                required
+                style="border-left: none"
+                name="urlPath"
+              />
+            </div>
+          </label>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 text-black font-bold rounded transition-colors duration-150 hover:bg-blue-400"
+          >
+            Submit
+          </button>
+        </form>
+      </main>
+      <footer class="mt-6 text-xs text-blue-300 text-center">
+        &copy; UIUCTF 2025 Admin Bot | All Systems Operational
+      </footer>
+    </div>
+
+    <script>
+      const form = document.querySelector("form");
+      const input = form.querySelector("input");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        fetch("/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url_part: input.value,
+          }),
+        });
+      });
+    </script>
+  </body>
+</html>

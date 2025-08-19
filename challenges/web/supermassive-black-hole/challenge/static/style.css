@@ -1,0 +1,172 @@
+body { 
+    font-family: Arial, sans-serif; 
+    max-width: 1000px; 
+    margin: 0 auto; 
+    padding: 20px; 
+    background: #f0f0f0;
+}
+.container { 
+    background: white; 
+    padding: 30px; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 { 
+    color: #2c3e50; 
+    text-align: center;
+}
+.nav {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.nav a {
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+.nav a:hover {
+    text-decoration: underline;
+}
+.email {
+    font-family: monospace;
+    background: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: #495057;
+    font-weight: bold;
+}
+.company-info {
+    background: #e8f4fd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #3498db;
+}
+.ticket { 
+    background: #f8f9fa; 
+    padding: 20px; 
+    border-radius: 5px; 
+    margin: 20px 0;
+    border-left: 4px solid #007bff;
+}
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.status {
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    text-align: center;
+    font-weight: bold;
+}
+.ticket-id {
+    font-size: 12px;
+    color: #666;
+    font-family: monospace;
+}
+.timestamp {
+    font-size: 12px;
+    color: #666;
+}
+.response { 
+    background: #e8f5e8; 
+    padding: 15px; 
+    border-radius: 5px; 
+    margin: 10px 0;
+    border-left: 4px solid #28a745;
+}
+.response.flag {
+    background: #ffbdbd;
+    border-left: 4px solid #dc3545;
+}
+.response.unauthorized {
+    background: #ffdeb4;
+    border-left: 4px solid #ff8800;
+}
+.response.pending {
+    background: #e2e3e5;
+    border-left: 4px solid #6c757d;
+}
+.back-link { 
+    display: inline-block; 
+    margin-top: 20px; 
+    color: #007bff; 
+    text-decoration: none;
+    padding: 10px 20px;
+    background: #e9ecef;
+    border-radius: 5px;
+}
+.back-link:hover { 
+    background: #dee2e6;
+    text-decoration: none;
+}
+.no-tickets {
+    text-align: center;
+    color: #666;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+.clear-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    float: right;
+}
+.clear-btn:hover {
+    background: #c82333;
+}
+.back-link { 
+    display: inline-block; 
+    margin-top: 20px; 
+    color: #007bff; 
+    text-decoration: none;
+    padding: 10px 20px;
+    background: #e9ecef;
+    border-radius: 5px;
+}
+.back-link:hover { 
+    background: #dee2e6;
+    text-decoration: none;
+}
+input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}

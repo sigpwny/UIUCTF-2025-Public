@@ -1,0 +1,180 @@
+{% extends "base.html" %} {% block title %}New Shipment - SIGPwny Shipping Bay{%
+endblock %} {% block content %}
+<div class="panel p-4 rounded">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-text-primary">Create New Shipment</h2>
+    <a href="/" class="btn-retro px-4 py-2 rounded text-sm transition-all">
+      Back to Shipments
+    </a>
+  </div>
+
+  <div class="panel-inset p-4 rounded">
+    <form method="POST" action="/create_shipment" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Origin Station</label
+          >
+          <select
+            name="origin"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          >
+            <option value="">Select Origin...</option>
+            <option value="Earth Station Alpha">Earth Station Alpha</option>
+            <option value="Earth Station Beta">Earth Station Beta</option>
+            <option value="Earth Station Gamma">Earth Station Gamma</option>
+            <option value="Earth Station Delta">Earth Station Delta</option>
+            <option value="Luna City">Luna City</option>
+            <option value="Mars Colony Alpha">Mars Colony Alpha</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Destination</label
+          >
+          <select
+            name="destination"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          >
+            <option value="">Select Destination...</option>
+            <option value="Luna City">Luna City</option>
+            <option value="Mars Colony Alpha">Mars Colony Alpha</option>
+            <option value="Mars Colony Beta">Mars Colony Beta</option>
+            <option value="Europa Research Base">Europa Research Base</option>
+            <option value="Asteroid Belt Mining Station">
+              Asteroid Belt Mining Station
+            </option>
+            <option value="Titan Outpost">Titan Outpost</option>
+            <option value="Deep Space Station 9">Deep Space Station 9</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Supply Type</label
+          >
+          <select
+            name="supply_type"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          >
+            <option value="">Select Supply Type...</option>
+            <option value="Scientific Instruments">
+              Scientific Instruments
+            </option>
+            <option value="Quantum Processors">Quantum Processors</option>
+            <option value="Hydroponic Supplies">Hydroponic Supplies</option>
+            <option value="Mining Equipment">Mining Equipment</option>
+            <option value="Medical Supplies">Medical Supplies</option>
+            <option value="Construction Materials">
+              Construction Materials
+            </option>
+            <option value="Food & Provisions">Food & Provisions</option>
+            <option value="Energy Cells">Energy Cells</option>
+            <option value="flag" disabled>Flag</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Weight</label
+          >
+          <input
+            type="text"
+            name="weight"
+            placeholder="e.g., 2.4 tons"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Departure Date</label
+          >
+          <input
+            type="date"
+            name="departure"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Expected Arrival</label
+          >
+          <input
+            type="date"
+            name="arrival"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Priority Level</label
+          >
+          <select
+            name="priority"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          >
+            <option value="">Select Priority...</option>
+            <option value="Low">Low Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="High">High Priority</option>
+            <option value="Critical">Critical Priority</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-text-primary mb-1"
+            >Assigned Vessel</label
+          >
+          <select
+            name="vessel"
+            required
+            class="form-control w-full p-2 rounded text-sm"
+          >
+            <option value="">Select Vessel...</option>
+            <option value="USS Tomorrow">USS Tomorrow</option>
+            <option value="Lunar Express">Lunar Express</option>
+            <option value="Cargo Hauler IX">Cargo Hauler IX</option>
+            <option value="Research Vessel VII">Research Vessel VII</option>
+            <option value="Mars Freighter">Mars Freighter</option>
+            <option value="Deep Space Courier">Deep Space Courier</option>
+            <option value="Quantum Runner">Quantum Runner</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-center pt-4">
+        <button
+          type="submit"
+          class="btn-retro px-6 py-3 rounded font-bold transition-all"
+        >
+          Launch Shipment
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-4 text-center text-text-secondary text-sm">
+    <p>
+      All shipments are tracked via quantum communication relay (like any good
+      shipping service we will lose your package)
+    </p>
+  </div>
+</div>
+{% endblock %}

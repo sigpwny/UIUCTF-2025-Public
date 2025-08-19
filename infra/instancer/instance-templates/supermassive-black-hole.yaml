@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: INSTANCE_NAME
+  namespace: supermassive-black-hole-managed
+  labels:
+    name: INSTANCE_NAME
+spec:
+  activeDeadlineSeconds: 900
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: supermassive-black-hole
+        name: INSTANCE_NAME
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      containers:
+        - name: challenge
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/supermassive-black-hole-challenge:122f11b8f89dac5d3882b50437523613938c9be3ae933f0ee55c7c4e812deefe
+          ports:
+            - containerPort: 8080
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+      restartPolicy: Never
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: INSTANCE_NAME
+  namespace: supermassive-black-hole-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  selector:
+    app: supermassive-black-hole
+    name: INSTANCE_NAME
+  ports:
+    - name: challenge
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+  publishNotReadyAddresses: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: INSTANCE_NAME
+  namespace: supermassive-black-hole-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  entryPoints:
+    - https
+  routes:
+    - match: Host(`INSTANCE_NAME-supermassive-black-hole.chal.uiuc.tf`)
+      kind: Rule
+      services:
+        - name: INSTANCE_NAME
+          port: 80
+  tls: {}

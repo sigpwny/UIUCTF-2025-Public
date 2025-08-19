@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "nodenext",
+    "noEmitOnError": true,
+    "sourceMap": true,
+    "outDir": "dist"
+  }
+}

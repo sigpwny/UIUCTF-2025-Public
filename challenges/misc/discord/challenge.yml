@@ -1,0 +1,16 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Discord
+author: SIGPwny
+category: misc
+description: |-
+  Join the discord to get a flag! https://discord.gg/PytGqjq
+value: 50
+tags:
+  - easy
+flags:
+  - uiuctf{d0nt_5p4c3_0ut}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

@@ -1,0 +1,43 @@
+apiVersion: kctf.dev/v1
+kind: Challenge
+metadata:
+  name: shipping-bay
+spec:
+  deployed: true
+  powDifficultySeconds: 0
+  network:
+    public: false
+    ports:
+      - protocol: "TCP"
+        port: 1337
+        targetPort: 8080
+  healthcheck:
+    enabled: true
+    image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/shipping-bay-healthcheck:88792498113690ece7c13728bbeecc86d659e084efe49bf30fe6ffd54b193f98
+  image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/shipping-bay-challenge:ea48eab60d063adb847b1a126ca83304f45bbc10719579ccaf905794014c21f7
+  podTemplate:
+    template:
+      spec:
+        containers:
+          - name: challenge
+            env:
+              - name: FLAG
+                value: "uiuctf{maybe_we_should_check_schemas_8e229f}"
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: shipping-bay
+  labels:
+    app: shipping-bay
+spec:
+  entryPoints:
+    - https
+  routes:
+    - match: Host(`shipping-bay.chal.uiuc.tf`)
+      kind: Rule
+      services:
+        - name: shipping-bay
+          port: 1337
+  tls:
+    secretName: tls-cert

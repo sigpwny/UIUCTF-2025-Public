@@ -1,0 +1,18 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Feedback
+author: SIGPwny
+category: misc
+description: |-
+  Please fill out this feedback form so we can improve for next year! https://forms.gle/b82Lnm8Zf2s3saki6
+
+  This challenge will not be a factor for time-based tiebreaks (for prize earning placements), so please take your time when filling it out. There will be no advantage to submitting the flag earlier than another team.
+value: 1
+tags:
+  - easy
+flags:
+  - uiuctf{y0u_d1dn7_5p4c3_0u7}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

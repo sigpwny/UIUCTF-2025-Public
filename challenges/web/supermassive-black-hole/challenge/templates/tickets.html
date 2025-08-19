@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Support Tickets - Black Hole Ticketing Services</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/tickets">View My Tickets</a>
+        </div>
+        
+        <h1>My Support Tickets</h1>
+        
+        <button class="clear-btn" onclick="clearTickets()">Clear All Tickets</button>
+        <div style="height: 20px;"></div>
+        
+        <div id="tickets-container">
+            <div class="no-tickets">
+                <h3>Loading tickets...</h3>
+            </div>
+        </div>
+        
+        <a href="/" class="back-link">← Submit New Ticket</a>
+    </div>
+
+    <script>
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        function getResponseClass(response) {
+            if (response === 'Processing...') return 'pending';
+            if (response.includes('uiuctf{')) return 'flag';
+            if (response.includes('Please use our support portal to submit a ticket.')) return 'unauthorized';
+            return '';
+        }
+
+        async function checkTicketResponse(ticketId) {
+            try {
+                const response = await fetch(`/check_response/${ticketId}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error checking response:', error);
+                return { status: 'pending' };
+            }
+        }
+
+        async function loadTickets() {
+            const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+            const container = document.getElementById('tickets-container');
+            
+            if (tickets.length === 0) {
+                container.innerHTML = `
+                    <div class="no-tickets">
+                        <h3>No tickets submitted yet</h3>
+                        <p>Submit a support ticket to see IT responses here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort tickets by timestamp (newest first)
+            tickets.sort((a, b) => b.timestamp - a.timestamp);
+
+            let html = '';
+            
+            for (const ticket of tickets) {
+                // Check for response if not already received
+                if (ticket.status === 'submitted') {
+                    const responseData = await checkTicketResponse(ticket.id);
+                    if (responseData.status !== 'pending') {
+                        // Update ticket with response
+                        ticket.response = responseData.response;
+                        ticket.status = 'responded';
+                        
+                        // Update localStorage
+                        localStorage.setItem('tickets', JSON.stringify(tickets));
+                    } else {
+                        ticket.response = 'Processing...';
+                    }
+                }
+
+                const responseClass = getResponseClass(ticket.response || 'Processing...');
+                
+                html += `
+                    <div class="ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-id">Ticket #${ticket.id}</div>
+                            <div class="timestamp">${formatTimestamp(ticket.timestamp)}</div>
+                        </div>
+                        
+                        <h3>Ticket Details:</h3>
+                        <p><strong>Subject:</strong> ${ticket.subject}</p>
+                        <p><strong>Message:</strong> ${ticket.body}</p>
+                        
+                        <h3>IT Department Response:</h3>
+                        <div class="response ${responseClass}">
+                            <p><strong>Response:</strong> ${ticket.response || 'Processing...'}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function clearTickets() {
+            if (confirm('Are you sure you want to clear all your tickets?')) {
+                localStorage.removeItem('tickets');
+                loadTickets();
+            }
+        }
+
+        // Load tickets on page load
+        loadTickets();
+
+        // Auto-refresh every 3 seconds to check for new responses
+        setInterval(loadTickets, 1000);
+    </script>
+</body>
+</html>

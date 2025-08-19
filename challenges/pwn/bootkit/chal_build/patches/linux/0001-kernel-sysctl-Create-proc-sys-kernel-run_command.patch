@@ -1,0 +1,36 @@
+From 5529f07d0e6abe6a1b0152d36ef831738058a4ad Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Tue, 8 Jul 2025 21:05:20 -0700
+Subject: [PATCH] kernel/sysctl: Create /proc/sys/kernel/run_command
+
+Just a read-only variable, nothing special yet.
+
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ kernel/sysctl.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+index 3b7a7308e35b..821f7235cbd4 100644
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
+@@ -1587,7 +1587,16 @@ int proc_do_static_key(const struct ctl_table *table, int write,
+ 	return ret;
+ }
+ 
++static char sysctl_run_command[100];
++
+ static const struct ctl_table kern_table[] = {
++	{
++		.procname	= "run_command",
++		.data		= &sysctl_run_command,
++		.maxlen		= sizeof(sysctl_run_command),
++		.mode		= 0400,
++		.proc_handler	= proc_dostring,
++	},
+ 	{
+ 		.procname	= "panic",
+ 		.data		= &panic_timeout,
+-- 
+2.50.0
+

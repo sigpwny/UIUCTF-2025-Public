@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: INSTANCE_NAME
+  namespace: ruler-of-the-universe-managed
+  labels:
+    name: INSTANCE_NAME
+spec:
+  activeDeadlineSeconds: 900
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: ruler-of-the-universe
+        name: INSTANCE_NAME
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      containers:
+        - name: challenge
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/ruler-of-the-universe-challenge:509266b0e4867a04f27ba1338a9c9c8855cd35431c47dd442f857e8de36d9eac
+          ports:
+            - containerPort: 3000
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+        - name: adminbot
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/ruler-of-the-universe-adminbot:136a85a0f289722c8f6af8b0230596c3a307008af2dac7986a9c91171fb7ca54
+          ports:
+            - containerPort: 3001
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 0.5Gi
+      restartPolicy: Never
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: INSTANCE_NAME
+  namespace: ruler-of-the-universe-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  selector:
+    app: ruler-of-the-universe
+    name: INSTANCE_NAME
+  ports:
+    - name: challenge
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+    - name: adminbot
+      protocol: TCP
+      port: 81
+      targetPort: 3001
+  type: ClusterIP
+  publishNotReadyAddresses: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: INSTANCE_NAME
+  namespace: ruler-of-the-universe-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  entryPoints:
+    - https
+  routes:
+    - match: Host(`INSTANCE_NAME-ruler-of-the-universe.chal.uiuc.tf`)
+      kind: Rule
+      services:
+        - name: INSTANCE_NAME
+          port: 80
+  tls: {}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: INSTANCE_NAME-adminbot
+  namespace: ruler-of-the-universe-managed
+  labels:
+    name: INSTANCE_NAME-adminbot
+  ownerReferences: null
+spec:
+  entryPoints:
+    - https
+  routes:
+    - match: Host(`INSTANCE_NAME-adminbot-ruler-of-the-universe.chal.uiuc.tf`)
+      kind: Rule
+      services:
+        - name: INSTANCE_NAME
+          port: 81
+  tls: {}

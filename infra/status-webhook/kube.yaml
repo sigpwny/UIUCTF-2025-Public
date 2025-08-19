@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: status-webhook
+  namespace: default
+  labels:
+    app: status-webhook
+spec:
+  selector:
+    matchLabels:
+      app: status-webhook
+  template:
+    metadata:
+      labels:
+        app: status-webhook
+        uiuctf-egress: all
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      containers:
+        - name: bot
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/status-webhook-bot:385c5bd2dbd15b6aa0c74f4f022b39168f8f2d1ff3247233436f3d8b701452fa
+          env:
+            - name: MESSAGE_ID
+              value: "1398119362006876233"
+          envFrom:
+            - secretRef:
+                name: status-webhook-secrets
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false

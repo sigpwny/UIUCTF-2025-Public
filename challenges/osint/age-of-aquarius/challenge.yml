@@ -1,0 +1,30 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Age of Aquarius
+author: Emma
+category: osint
+description: |-
+  Now that we know about Mr. Blue Sky's troll, we can learn more about her. It looks like she's got a birthday party coming up, can you figure out in which country (and province or state, if relevant)?
+
+  If you have not completed "Bad Blood", I recommend beginning there.
+
+  Flag format: uiuctf{country, state/province} or uiuctf{country, none}  (like the word "none") if no province or state.
+
+  **author**: Emma
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{Canada, Saskatchewan}
+  - uiuctf{canada, saskatchewan}
+  - uiuctf{canada,Saskatchewan}
+  - uiuctf{canada,saskatchewan}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

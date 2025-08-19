@@ -1,0 +1,34 @@
+{
+  "name": "uiuctf-2025-theme",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@fontsource/monaspace-krypton": "^5.2.5",
+    "@tailwindcss/vite": "^4.1.7",
+    "@threlte/core": "^8.0.4",
+    "@threlte/extras": "^9.2.1",
+    "@types/dompurify": "^3.0.5",
+    "@types/marked": "^5.0.2",
+    "astro": "^5.11.0",
+    "dayjs": "^1.11.13",
+    "dompurify": "^3.2.6",
+    "marked": "^16.1.1",
+    "svelte": "^5.37.0",
+    "tailwindcss": "^4.1.7",
+    "three-geojson-geometry": "^2.1.1",
+    "toastify-js": "^1.12.0"
+  },
+  "devDependencies": {
+    "@astrojs/svelte": "^7.1.0",
+    "@types/toastify-js": "^1.12.4",
+    "prettier": "^3.6.2",
+    "prettier-plugin-svelte": "^3.4.0",
+    "three": "^0.176.0"
+  }
+}

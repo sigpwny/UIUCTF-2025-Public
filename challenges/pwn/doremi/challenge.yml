@@ -1,0 +1,24 @@
+name: "do re mi"
+author: "Surg"
+category: pwn
+description: |-
+  The musl allocator was too slow, so we went to a company known for 🚀 Blazing Fast 🚀 software, Microsoft!
+
+  `ncat --ssl doremi.chal.uiuc.tf 1337`
+
+  **author**: Surg
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{does_anyone_still_like_doing_these_?_have_we_not_conquered_every_land_?}
+tags:
+  - pwn
+  - heap
+files:
+  - handouts/handout.tar.gz
+state: visible
+version: "0.1"

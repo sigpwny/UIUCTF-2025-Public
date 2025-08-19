@@ -1,0 +1,143 @@
+---
+import Layout from "@/layouts/Base.astro";
+import ProfileCard from "@/components/profile/ProfileCard.astro";
+const profiles = [
+    {
+        name: "Minh",
+        handle: "whitehoodhacker",
+        profile_image: {
+            src: "/devImgs/minh.png",
+        },
+        links: ["https://aka.ms/minh"],
+        bio: "I should be finishing the CTFd theme right now",
+    },
+    {
+        name: "YiFei Zhu",
+        handle: "zhuyifei1999",
+        profile_image: {
+            src: "/devImgs/yifeizhu.png",
+        },
+        links: ["https://github.com/zhuyifei1999/"],
+        bio: "int $0x80; outb %al,$0xB2",
+    },
+    {
+        name: "32121",
+        handle: "32121",
+        profile_image: {
+            src: "/devImgs/32121.png",
+        },
+        links: ["https://github.com/user32121"],
+        bio: "Sometimes I wish I didn't learn 2 esolangs per ctf",
+    },
+    {
+        name: "n8",
+        handle: "farlow.dev",
+        profile_image: {
+            src: "/devImgs/n8.png",
+        },
+        links: ["https://farlow.dev/"],
+        bio: "🐪",
+    },
+    {
+        name: "Cameron",
+        handle: "bigkirbs",
+        profile_image: {
+            src: "/devImgs/cam.png",
+        },
+        links: [],
+        bio: "🚧🏗️",
+    },
+    {
+        name: "Sam",
+        handle: "surgdev",
+        profile_image: {
+            src: "/devImgs/sam.png",
+        },
+        links: ["https://surg.dev/"],
+        bio: "I shouldn't be allowed to code anymore",
+    },
+    {
+        name: "Eritque Arcus",
+        handle: "e_ritque.arcus",
+        profile_image: {
+            src: "/devImgs/eritquearcus.png",
+        },
+        links: ["https://ikuyo.dev"],
+        bio: "O_o",
+    },
+    {
+        name: "CBCicada",
+        handle: "cbcicada",
+        profile_image: {
+            src: "/devImgs/cbc.png",
+        },
+        links: [],
+        bio: "No. More. OSINT.",
+    },
+    {
+        name: "sonnyboy1205",
+        handle: "sonnyboy1205",
+        profile_image: {
+            src: "/devImgs/sonny.png",
+        },
+        links: [],
+        bio: "RIP OSINT",
+    },
+    {
+        name: "Krishnan Shankar",
+        handle: "krishnans2006",
+        profile_image: {
+            src: "/devImgs/kris.png",
+        },
+        links: ["https://github.com/krishnans2006"],
+        bio: "❄️",
+    },
+    {
+        name: "Emma Hartman",
+        handle: "lukewarmdaisies",
+        profile_image: {
+            src: "/devImgs/emma.png",
+        },
+        links: ["https://github.com/eihart123"],
+        bio: "I promise you don't need to follow me on Spotify this time",
+    },
+    {
+        name: "George Huebner",
+        handle: "shorden",
+        profile_image: {
+            src: "/devImgs/george.png",
+        },
+        links: ["https://feyor.sh/"],
+        bio: "Busy breaking prod",
+    },
+    {
+        name: "steven_p",
+        handle: "steven_p",
+        profile_image: {
+            src: "/devImgs/steven.png",
+        },
+        links: ["https://github.com/stevenxpan"],
+        bio: "🐍",
+    },
+];
+
+const sortedProfiles = profiles.slice().sort((a, b) => {
+    const initialA = a.name[0].toLowerCase();
+    const initialB = b.name[0].toLowerCase();
+    return initialA.localeCompare(initialB);
+});
+---
+
+<Layout title="Dev">
+    <div
+        class="grid xl:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-4 overflow-y-auto"
+    >
+        {
+            sortedProfiles.map((profile, idx) => (
+                <div>
+                    <ProfileCard profile={profile} showFull={true} />
+                </div>
+            ))
+        }
+    </div>
+</Layout>

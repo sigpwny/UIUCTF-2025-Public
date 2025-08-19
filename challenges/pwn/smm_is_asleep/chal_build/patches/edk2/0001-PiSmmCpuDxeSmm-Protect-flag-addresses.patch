@@ -1,0 +1,57 @@
+From 757db4b246cca19b786f779fd918da2fadfc52c8 Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Mon, 28 Mar 2022 17:55:14 -0700
+Subject: [PATCH 1/2] PiSmmCpuDxeSmm: Protect flag addresses
+
+So attacker must disable paging or overwrite page table entries
+(which would require disabling write protection in cr0... so, the
+latter is redundant to former)
+
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c |  7 +++++++
+ UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c            | 10 ++++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c b/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c
+index 9c2fe162a9..202c73adc5 100644
+--- a/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c
++++ b/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c
+@@ -925,6 +925,13 @@ PatchGdtIdtMap (
+     Size,
+     EFI_MEMORY_XP
+     );
++
++  // Flag must not be seen
++  SmmSetMemoryAttributes (
++    0x44440000,
++    EFI_PAGES_TO_SIZE(1),
++    EFI_MEMORY_RP
++    );
+ }
+ 
+ /**
+diff --git a/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c b/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c
+index 2bc39a51e3..efe5b2d341 100644
+--- a/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c
++++ b/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c
+@@ -825,6 +825,16 @@ SmiPFHandler (
+       goto Exit;
+     }
+ 
++    if ((PFAddress >= 0x44440000 && PFAddress < 0x44440000 + EFI_PAGES_TO_SIZE(1))) {
++      DumpCpuContext (InterruptType, SystemContext);
++      DEBUG ((DEBUG_ERROR, "Access to flag forbidden (0x%lx)!\n", PFAddress));
++      DEBUG_CODE (
++        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
++        );
++      CpuDeadLoop ();
++      goto Exit;
++    }
++
+     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
+       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
+     }
+-- 
+2.50.0
+

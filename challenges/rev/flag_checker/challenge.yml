@@ -1,0 +1,23 @@
+name: flag_checker
+author: epistemologist
+category: rev
+description: |-
+  Another flag checker challenge...can you get the correct input to print out the flag?
+
+  **author**: epistemologist
+value: 500
+type: dynamic
+tags:
+  - medium
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - sigpwny{CrackingDiscreteLogs4TheFun/Lols}
+  - uiuctf{CrackingDiscreteLogs4TheFun/Lols}
+  - CrackingDiscreteLogs4TheFun/Lols
+state: visible
+version: "0.1"
+files:
+  - ./flag_checker

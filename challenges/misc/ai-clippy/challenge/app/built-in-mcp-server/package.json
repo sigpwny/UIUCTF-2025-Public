@@ -1,0 +1,16 @@
+{
+  "name": "mcp-servers",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node stdio-server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

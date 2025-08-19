@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CHALLENGE_IMAGES+=(adminbot)
+
+function instancer_hook_start {
+  "${KCTF_BIN}/yq" eval "(select(.kind == \"Job\") | select(.metadata.name == \"INSTANCE_NAME\") | .spec.template.spec.containers.[] | select(.name == \"adminbot\").image) = \"${IMAGES_REMOTE[adminbot]}\"" --inplace "${INSTANCER_DIR}/instance-templates/${CHALLENGE_NAME}.yaml" || return 1
+}

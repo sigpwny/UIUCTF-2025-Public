@@ -1,0 +1,50 @@
+---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+export interface AvatarProps {
+  profile?: ProfileProps;
+  label?: string;
+}
+
+export interface ProfileProps {
+  name?: string;
+  profile_image?: ImageMetadata;
+}
+
+const { profile, label }: AvatarProps = Astro.props;
+
+function calculateInitials(name: string) {
+  const names = name.split(" ");
+  if (names.length === 1) {
+    return names[0][0];
+  } else {
+    return names[0][0] + names[names.length - 1][0];
+  }
+}
+
+const text_content = label
+  ? label
+  : profile && profile.name
+    ? calculateInitials(profile!.name)
+    : null;
+---
+
+{
+  profile && profile.profile_image ? (
+    <span class="rounded-full overflow-hidden inline-block">
+      <Picture
+        src={profile.profile_image.src}
+        alt="Profile image"
+        width={profile.profile_image.width ? profile.profile_image.width : 600}
+        height={profile.profile_image.height ? profile.profile_image.height : 600}
+        class="object-cover w-full h-full"
+        pictureAttributes={{ class: "object-cover w-full h-full" }}
+      />
+    </span>
+  ) : text_content ? (
+    <div class="rounded-full bg-gray-200 flex items-center justify-center w-16 h-16 text-xl font-bold">
+      {text_content}
+    </div>
+  ) : null
+}

@@ -1,0 +1,99 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import monaspaceKryptonLatin700Woff2 from '@fontsource/monaspace-krypton/files/monaspace-krypton-latin-700-normal.woff2?url';
+
+export interface HeadProps {
+  site_name?: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  video?: string;
+  type?: string;
+  twitterUsername?: string;
+  color?: string;
+  disable_robots?: boolean;
+  redirect?: string;
+};
+
+const props = {
+  site_name: "UIUCTF 2025",
+  title: "UIUCTF 2025",
+  description: "Calling all space crews!",
+  image: "/favicon/web-app-manifest-512x512.png",
+  type: "website",
+  twitterUsername: "@sigpwny",
+  color: "#000000",
+  ...Astro.props,
+} as HeadProps;
+
+if (!props.site_name) {
+  throw new Error("site_name is required Head");
+}
+
+const siteName = props.site_name;
+const displayTitle = props.title === props.site_name ? props.site_name : `${props.title} | ${props.site_name}`;
+const title = props.title;
+const description = props.description;
+const twitterCardType = "summary";
+const twitterUsername = props.twitterUsername;
+const image = props.image ? new URL(props.image, Astro.url).toString() : undefined;
+const type = props.type || "website";
+const canonicalURL = Astro.url.toString();
+const color = props.color || "#33cc55";
+const robots = props.disable_robots ? "noindex, nofollow" : "index, follow";
+---
+<head>
+  {/* Global Metadata */}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content={Astro.generator} />
+  <meta name="robots" content={robots} />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#000000" />
+  {/* Font preloads */}
+  <link rel="preload" as="font" type="font/woff2" href={monaspaceKryptonLatin700Woff2} crossorigin="anonymous" />
+  {/* Favicons/PWA manifest */}
+  <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="UIUCTF" />
+  <link rel="manifest" href="/favicon/site.webmanifest" />
+  {/* Canonical URL */}
+  <link rel="canonical" href={canonicalURL} />
+  {/* Primary Meta Tags */}
+  <title>{displayTitle}</title>
+  <meta name="title" content={title} />
+  <meta name="description" content={description} />
+  {/* Open Graph / Facebook */}
+  <meta property="og:type" content={type} />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={image} />
+  {props.video ? (
+    <meta property="og:video" content={props.video} />
+    <meta property="og:video:type" content="text/html" />
+    <meta property="og:video:url" content={props.video} />
+    <meta property="og:video:width" content="1280" />
+    <meta property="og:video:height" content="720" />
+  ) : null}
+  {/* Twitter */}
+  <meta property="twitter:card" content={twitterCardType} />
+  <meta property="twitter:site" content={twitterUsername} />
+  <meta property="twitter:url" content={canonicalURL} />
+  <meta property="twitter:title" content={title} />
+  <meta property="twitter:description" content={description} />
+  <meta property="twitter:image" content={image} />
+  {props.video ? (
+    <meta property="twitter:player" content={props.video} />
+    <meta property="twitter:player:width" content="1280" />
+    <meta property="twitter:player:height" content="720" />
+  ) : null}
+  {/* Redirect */}
+  {props.redirect ? (
+    <meta http-equiv="refresh" content={`0;url=${props.redirect}`} />
+  ) : null}
+  <ClientRouter />
+</head>

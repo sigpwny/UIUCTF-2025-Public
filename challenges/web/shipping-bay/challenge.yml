@@ -1,0 +1,27 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Shipping Bay
+author: Cameron
+category: web
+description: |-
+  UPS lost my package, so I'm switching to a more reliable carrier. 
+
+  Challenge url: https://shipping-bay.chal.uiuc.tf/.
+
+  **author**: Cameron
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{maybe_we_should_check_schemas_8e229f}
+files:
+  - handouts/handout.tar.gz
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

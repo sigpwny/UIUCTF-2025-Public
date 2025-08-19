@@ -1,0 +1,57 @@
+name: "Bootkit"
+author: "YiFei Zhu"
+category: pwn
+description: |-
+  Many years later, in a galaxy far far away, the Empire of UIUCTF was collecting UEFI patches for their secret lab machines, and stumbled upon the remains of SIGPwny Inc. and PwnySIG Inc. Not knowing the dangers, they installed both patch sets to their super secure lab machines, with TPM-sealed disk encryption protecting their latest research (flag).
+
+  As the lead security officer of the rebellion against the Empire, you need their research to expose the Empire of their anti-droid vendetta. Unfortunately, you discovered that the Empire designed the secret disks such that they detach themselves as soon as any keyboard input is detected during boot, and since you need the keyboard to install the bootkit, the bootkit must survive the reboot. TPM also hashes everything on the boot disk and there's no hope of keeping the bootkit there.
+
+  That leaves only one option, completely and utterly pwning the firmware...
+
+  Lua.efi, but with persistance. SMM is Asleep, but with purpose.
+
+  `$ socat file:$(tty),raw,echo=0 openssl:bootkit.chal.uiuc.tf:1337`
+
+  <details><summary>Show hint #1</summary>UEFIReplace from https://github.com/LongSoft/UEFITool/tree/old_engine is
+    installed remotely in the initramfs, so you don't need to transfer
+    megabytes of data though serial.</details>
+
+  <details><summary>Show hint #2</summary>Command entered into /proc/sys/kernel/run_command will be run by initrd.
+    Without, one could spawn processes by writing to kernel data structs
+    (or modprobe_path I guess) since you have arbitrary kernel write anyways...</details>
+
+  <details><summary>Show hint #3</summary>KASLR is off. With KASLR one could just easily compute the offset from the
+    call stack.</details>
+
+  <details><summary>Show hint #4</summary>PCR 0 and 1 are not measured. If they were, one could feed TPM with fake
+    hashes since system boot, considering you have arbitrary CFI flash write
+    anyways... I mean, who said the hashes has to be of a real blob?
+    [<a href="https://github.com/tianocore/edk2/blob/8be9a344d35316fb0ee70a33779a7a931fcb8a1d/SecurityPkg/Library/Tpm2CommandLib/Tpm2Integrity.c#L92" target="_blank" rel="noopener noreferrer">1</a>]
+    [<a href="https://github.com/stefanberger/libtpms/blob/7dfe310f06cc188187807d36e4786458e3e14e86/src/tpm2/IntegrityCommands.c#L66" target="_blank" rel="noopener noreferrer">2</a>]
+    [<a href="https://github.com/microsoft/ms-tpm-20-ref/blob/ee21db0a941decd3cac67925ea3310873af60ab3/TPMCmd/tpm/src/command/PCR/PCR_Extend.c" target="_blank" rel="noopener noreferrer">3</a>]
+    [<a href="https://github.com/tpm2-software/tpm2-tools/blob/112f0e547a7a83d625b585e506449a185e9268cc/man/tpm2_pcrextend.1.md" target="_blank" rel="noopener noreferrer">4</a>]
+    [<a href="https://trustedcomputinggroup.org/wp-content/uploads/Trusted-Platform-Module-2.0-Library-Part-3-Version-184_pub.pdf" target="_blank" rel="noopener noreferrer">5</a>, Section 22.2]
+  </details>
+
+  **author**: YiFei Zhu
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{I_have_friends_everywhere:_smm_kernel_and_userspace_53fbc31c}
+tags:
+  - pwn
+  - uefi
+  - extreme
+files:
+  - handouts/README
+  - handouts/chal_build.tar.zst
+  - handouts/edk2_artifacts.tar.zst
+  - handouts/linux-headers.tar.zst
+  - handouts/run.tar.zst
+  - handouts/vmlinux.zst
+state: visible
+version: "0.1"

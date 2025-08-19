@@ -1,0 +1,78 @@
+#!/bin/bash
+# Copyright 2021-2025 Google LLC.
+# SPDX-License-Identifier: MIT
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+set -x
+
+mkdir -p /proc /dev /sys /etc /mnt
+
+mount -n -t proc -o nosuid,noexec,nodev proc /proc/
+mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
+mount -n -t sysfs -o nosuid,noexec,nodev sys /sys
+mount -n -t tmpfs -o mode=1777 tmpfs /tmp
+
+mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+mount -n -t securityfs securityfs /sys/kernel/security
+ln -s /proc/self/fd /dev/fd
+
+# efibootmgr -v
+# tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements
+
+if [[ ! -e /dev/tpm0 ]]; then
+    echo 'Error: No TPM?!'
+elif [[ ! -e /dev/vda ]]; then
+    echo 'Error: Disk is missing. Tamper attempt?'
+elif [[ $(dd if=/dev/vda bs=1 count=4 2>/dev/null) == LUKS ]]; then
+    # Encrypted disk
+
+    clevis luks unlock -d /dev/vda -n secret-disk -o --allow-discards
+    mount /dev/mapper/secret-disk /mnt
+elif [[ $(dd if=/dev/vda bs=1 count=8 skip=65600 2>/dev/null) == _BHRfS_M ]]; then
+    # Unencrypted disk
+
+    dd bs=512 count=4 if=/dev/urandom of=/tmp/initial_key iflag=fullblock
+    cryptsetup reencrypt \
+        --batch-mode \
+        --encrypt \
+        --type luks2 \
+        --reduce-device-size 32m \
+        --key-slot 0 \
+        --key-file /tmp/initial_key \
+        /dev/vda
+
+    # https://uapi-group.org/specifications/specs/linux_tpm_pcr_registry/
+    # https://www.freedesktop.org/software/systemd/man/latest/systemd-stub.html#id-1.8.5
+    # Our OEMs requested us to exclude PCR 0 so they can update the firmware.
+    # The build of systemd-stub is not TPM-enabled, however, the overridden
+    # command line is ignored via CONFIG_CMDLINE_OVERRIDE=y, and everything
+    # else mutable is addressed by PCR 4 and 9.
+    #
+    # Note: The overridden command line is also measured to PCR 9 by
+    # drivers/firmware/efi/libstub/efi-stub-helper.c:efi_convert_cmdline
+    # but I digress.
+    clevis luks bind \
+        -k /tmp/initial_key \
+        -s 1 \
+        -d /dev/vda tpm2 '{"pcr_bank":"sha256","pcr_ids":"2,3,4,5,6,7,9"}'
+    cryptsetup luksRemoveKey /dev/vda /tmp/initial_key
+
+    # TRIM this to reduce the size of the qcow2 image
+    clevis luks unlock -d /dev/vda -n secret-disk -o --allow-discards
+    mount /dev/mapper/secret-disk /mnt
+    fstrim -v /mnt
+    umount /mnt
+    cryptsetup close secret-disk
+
+    sync
+else
+    echo 'Error: Disk is corrupted'
+fi
+
+if [[ -n $(cat /proc/sys/kernel/run_command) ]]; then
+    cd /root && exec setsid bash -lc "$(cat /proc/sys/kernel/run_command)" 0<>"/dev/ttyS0" 1>&0 2>&0
+else
+    echo 'No command found, powering off.'
+    poweroff -f
+fi

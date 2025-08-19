@@ -1,0 +1,89 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: INSTANCE_NAME
+  namespace: upload-upload-and-away-managed
+  labels:
+    name: INSTANCE_NAME
+spec:
+  activeDeadlineSeconds: 900
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: upload-upload-and-away
+        name: INSTANCE_NAME
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      containers:
+        - name: challenge
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/upload-upload-and-away-challenge:98330c9e13a44f20a6a854665594108ee0429f42d1ef3dccfb9c5e1c491f9420
+          ports:
+            - containerPort: 3000
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/images
+            - name: dist
+              mountPath: /app/dist
+      initContainers:
+        - name: copy-dist-to-tmp-dist
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/upload-upload-and-away-challenge:98330c9e13a44f20a6a854665594108ee0429f42d1ef3dccfb9c5e1c491f9420
+          command: ['cp', '/app/dist/index.js', '/app/dist/index.js.map', '/mnt']
+          volumeMounts:
+            - name: dist
+              mountPath: /mnt
+      volumes:
+        - name: uploads
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+        - name: dist
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+      restartPolicy: Never
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: INSTANCE_NAME
+  namespace: upload-upload-and-away-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  selector:
+    app: upload-upload-and-away
+    name: INSTANCE_NAME
+  ports:
+    - name: challenge
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+  publishNotReadyAddresses: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: INSTANCE_NAME
+  namespace: upload-upload-and-away-managed
+  labels:
+    name: INSTANCE_NAME
+  ownerReferences: null
+spec:
+  entryPoints:
+    - https
+  routes:
+    - match: Host(`INSTANCE_NAME-upload-upload-and-away.chal.uiuc.tf`)
+      kind: Rule
+      services:
+        - name: INSTANCE_NAME
+          port: 80
+  tls: {}

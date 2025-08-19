@@ -1,0 +1,30 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Upload, Upload, and Away!
+author: Cameron
+category: web
+description: |-
+  Keeping track of all these files makes me so dizzy I feel like I'm floating in space.
+
+  Instancer url: https://upload-upload-and-away.chal.uiuc.tf/
+
+  Flag format: uiuctf{[a-z_]+}
+
+  **author**: Cameron
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{turing_complete_azolwkamgj}
+  - uiuctf{just_keep_uploading_e54ee521}
+files:
+  - handouts/handout.tar.gz
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

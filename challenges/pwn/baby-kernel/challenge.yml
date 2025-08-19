@@ -1,0 +1,22 @@
+name: "Baby Kernel"
+author: "nikhil"
+category: pwn
+description: |-
+  `ncat --ssl baby-kernel.chal.uiuc.tf 1337`
+
+  **author**: nikhil
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{use_after_free_ecda3a86}
+  - uiuctf{kernel_not_so_scary_faecc280} #Fake Flag
+tags:
+  - pwn
+files:
+  - challenge/handout.tar.zst
+state: visible
+version: "0.1"

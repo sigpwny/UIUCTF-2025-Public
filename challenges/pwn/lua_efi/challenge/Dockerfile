@@ -1,0 +1,43 @@
+# Copyright 2020-2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM ubuntu:24.04 AS tar-extract
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y zstd
+
+RUN mkdir /home/user/
+COPY run.tar.zst /home/user/
+RUN tar -C /home/user/ -xf /home/user/run.tar.zst
+
+FROM alpine AS chroot
+
+RUN apk add qemu-system-x86_64
+RUN mkdir /home/user/
+
+COPY --from=tar-extract /home/user/run /home/user/run
+COPY chal_run.sh /home/user/run/run.sh
+COPY flag /home/user/run/secret/flag
+
+FROM gcr.io/kctf-docker/challenge@sha256:9f15314c26bd681a043557c9f136e7823414e9e662c08dde54d14a6bfd0b619f
+
+COPY --from=chroot / /chroot
+RUN mkdir -p /chroot/proc /chroot/var/tmp
+
+COPY nsjail.cfg /home/user/
+
+CMD kctf_setup && \
+    kctf_drop_privs \
+    socat TCP-LISTEN:1337,reuseaddr,fork \
+        EXEC:'kctf_pow nsjail --config /home/user/nsjail.cfg --cwd /home/user/run -- ./run.sh'

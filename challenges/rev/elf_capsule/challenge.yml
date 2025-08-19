@@ -1,0 +1,31 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: ELF Capsule
+author: CBCicada
+category: rev
+description: |-
+  The ELF cannot be effectively delivered without the ELF.
+
+  Note:
+  - The flag consists of only printable ASCII characters.
+  - The flag has format uiuctf{...}, and inputs to program should follow this format.
+  - Your solve script shouldn't take more than 10 minutes to run.
+
+  **author**: CBCicada
+value: 500
+type: dynamic
+tags:
+  - medium
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{M3m0Ry_M4ppED_SysTEmca11}
+files:
+  - start.sh
+  - main.elf
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

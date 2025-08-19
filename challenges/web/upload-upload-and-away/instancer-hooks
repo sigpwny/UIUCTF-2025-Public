@@ -1,0 +1,5 @@
+#!/bin/bash
+
+function instancer_hook_start {
+  "${KCTF_BIN}/yq" eval "(select(.kind == \"Job\") | select(.metadata.name == \"INSTANCE_NAME\") | .spec.template.spec.initContainers.[] | select(.name == \"copy-dist-to-tmp-dist\").image) = \"${IMAGES_REMOTE[challenge]}\"" --inplace "${INSTANCER_DIR}/instance-templates/${CHALLENGE_NAME}.yaml" || return 1
+}

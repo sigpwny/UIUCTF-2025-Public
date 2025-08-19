@@ -1,0 +1,12 @@
+diff --git a/CTFd/schemas/users.py b/CTFd/schemas/users.py
+index 43b7e711..62a87911 100644
+--- a/CTFd/schemas/users.py
++++ b/CTFd/schemas/users.py
+@@ -372,6 +372,7 @@ class UserSchema(ma.ModelSchema):
+             "id",
+             "oauth_id",
+             "password",
++            "verified",
+             "fields",
+             "team_id",
+         ],

@@ -1,0 +1,248 @@
+From ab7f141e2bfe1a5fb706b396290da6a012377be2 Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Sat, 5 Jul 2025 10:22:22 -0700
+Subject: [PATCH 2/2] Lua: Remove many unneeded built-in code
+
+It's a calculator!
+
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ AppPkg/Applications/Lua/src/liolib.c | 91 ----------------------------
+ AppPkg/Applications/Lua/src/loslib.c | 60 ------------------
+ 2 files changed, 151 deletions(-)
+
+diff --git a/AppPkg/Applications/Lua/src/liolib.c b/AppPkg/Applications/Lua/src/liolib.c
+index a752394..75ccead 100644
+--- a/AppPkg/Applications/Lua/src/liolib.c
++++ b/AppPkg/Applications/Lua/src/liolib.c
+@@ -223,43 +223,6 @@ static void opencheck (lua_State *L, const char *fname, const char *mode) {
+ }
+ 
+ 
+-static int io_open (lua_State *L) {
+-  const char *filename = luaL_checkstring(L, 1);
+-  const char *mode = luaL_optstring(L, 2, "r");
+-  LStream *p = newfile(L);
+-  const char *md = mode;  /* to traverse/check mode */
+-  luaL_argcheck(L, lua_checkmode(md), 2, "invalid mode");
+-  p->f = fopen(filename, mode);
+-  return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
+-}
+-
+-
+-/*
+-** function to close 'popen' files
+-*/
+-static int io_pclose (lua_State *L) {
+-  LStream *p = tolstream(L);
+-  return luaL_execresult(L, lua_pclose(L, p->f));
+-}
+-
+-
+-static int io_popen (lua_State *L) {
+-  const char *filename = luaL_checkstring(L, 1);
+-  const char *mode = luaL_optstring(L, 2, "r");
+-  LStream *p = newprefile(L);
+-  p->f = lua_popen(L, filename, mode);
+-  p->closef = &io_pclose;
+-  return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
+-}
+-
+-
+-static int io_tmpfile (lua_State *L) {
+-  LStream *p = newfile(L);
+-  p->f = tmpfile();
+-  return (p->f == NULL) ? luaL_fileresult(L, 0, NULL) : 1;
+-}
+-
+-
+ static FILE *getiofile (lua_State *L, const char *findex) {
+   LStream *p;
+   lua_getfield(L, LUA_REGISTRYINDEX, findex);
+@@ -287,16 +250,6 @@ static int g_iofile (lua_State *L, const char *f, const char *mode) {
+ }
+ 
+ 
+-static int io_input (lua_State *L) {
+-  return g_iofile(L, IO_INPUT, "r");
+-}
+-
+-
+-static int io_output (lua_State *L) {
+-  return g_iofile(L, IO_OUTPUT, "w");
+-}
+-
+-
+ static int io_readline (lua_State *L);
+ 
+ 
+@@ -320,26 +273,6 @@ static int f_lines (lua_State *L) {
+ }
+ 
+ 
+-static int io_lines (lua_State *L) {
+-  int toclose;
+-  if (lua_isnone(L, 1)) lua_pushnil(L);  /* at least one argument */
+-  if (lua_isnil(L, 1)) {  /* no file name? */
+-    lua_getfield(L, LUA_REGISTRYINDEX, IO_INPUT);  /* get default input */
+-    lua_replace(L, 1);  /* put it at index 1 */
+-    tofile(L);  /* check that it's a valid file handle */
+-    toclose = 0;  /* do not close it after iteration */
+-  }
+-  else {  /* open a new file */
+-    const char *filename = luaL_checkstring(L, 1);
+-    opencheck(L, filename, "r");
+-    lua_replace(L, 1);  /* put file at index 1 */
+-    toclose = 1;  /* close it after iteration */
+-  }
+-  aux_lines(L, toclose);
+-  return 1;
+-}
+-
+-
+ /*
+ ** {======================================================
+ ** READ
+@@ -471,11 +404,6 @@ static int g_read (lua_State *L, FILE *f, int first) {
+ }
+ 
+ 
+-static int io_read (lua_State *L) {
+-  return g_read(L, getiofile(L, IO_INPUT), 1);
+-}
+-
+-
+ static int f_read (lua_State *L) {
+   return g_read(L, tofile(L), 2);
+ }
+@@ -531,11 +459,6 @@ static int g_write (lua_State *L, FILE *f, int arg) {
+ }
+ 
+ 
+-static int io_write (lua_State *L) {
+-  return g_write(L, getiofile(L, IO_OUTPUT), 1);
+-}
+-
+-
+ static int f_write (lua_State *L) {
+   FILE *f = tofile(L);
+   lua_pushvalue(L, 1);  /* push file at the stack top (to be returned) */
+@@ -574,11 +497,6 @@ static int f_setvbuf (lua_State *L) {
+ 
+ 
+ 
+-static int io_flush (lua_State *L) {
+-  return luaL_fileresult(L, fflush(getiofile(L, IO_OUTPUT)) == 0, NULL);
+-}
+-
+-
+ static int f_flush (lua_State *L) {
+   return luaL_fileresult(L, fflush(tofile(L)) == 0, NULL);
+ }
+@@ -589,16 +507,7 @@ static int f_flush (lua_State *L) {
+ */
+ static const luaL_Reg iolib[] = {
+   {"close", io_close},
+-  {"flush", io_flush},
+-  {"input", io_input},
+-  {"lines", io_lines},
+-  {"open", io_open},
+-  {"output", io_output},
+-  {"popen", io_popen},
+-  {"read", io_read},
+-  {"tmpfile", io_tmpfile},
+   {"type", io_type},
+-  {"write", io_write},
+   {NULL, NULL}
+ };
+ 
+diff --git a/AppPkg/Applications/Lua/src/loslib.c b/AppPkg/Applications/Lua/src/loslib.c
+index 39a4324..f603512 100644
+--- a/AppPkg/Applications/Lua/src/loslib.c
++++ b/AppPkg/Applications/Lua/src/loslib.c
+@@ -77,48 +77,6 @@
+ 
+ 
+ 
+-static int os_execute (lua_State *L) {
+-  const char *cmd = luaL_optstring(L, 1, NULL);
+-  int stat = system(cmd);
+-  if (cmd != NULL)
+-    return luaL_execresult(L, stat);
+-  else {
+-    lua_pushboolean(L, stat);  /* true if there is a shell */
+-    return 1;
+-  }
+-}
+-
+-
+-static int os_remove (lua_State *L) {
+-  const char *filename = luaL_checkstring(L, 1);
+-  return luaL_fileresult(L, remove(filename) == 0, filename);
+-}
+-
+-
+-static int os_rename (lua_State *L) {
+-  const char *fromname = luaL_checkstring(L, 1);
+-  const char *toname = luaL_checkstring(L, 2);
+-  return luaL_fileresult(L, rename(fromname, toname) == 0, NULL);
+-}
+-
+-
+-static int os_tmpname (lua_State *L) {
+-  char buff[LUA_TMPNAMBUFSIZE];
+-  int err;
+-  lua_tmpnam(buff, err);
+-  if (err)
+-    return luaL_error(L, "unable to generate a unique filename");
+-  lua_pushstring(L, buff);
+-  return 1;
+-}
+-
+-
+-static int os_getenv (lua_State *L) {
+-  lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
+-  return 1;
+-}
+-
+-
+ static int os_clock (lua_State *L) {
+   lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
+   return 1;
+@@ -272,18 +230,6 @@ static int os_difftime (lua_State *L) {
+ /* }====================================================== */
+ 
+ 
+-static int os_setlocale (lua_State *L) {
+-  static const int cat[] = {LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY,
+-                      LC_NUMERIC, LC_TIME};
+-  static const char *const catnames[] = {"all", "collate", "ctype", "monetary",
+-     "numeric", "time", NULL};
+-  const char *l = luaL_optstring(L, 1, NULL);
+-  int op = luaL_checkoption(L, 2, "all", catnames);
+-  lua_pushstring(L, setlocale(cat[op], l));
+-  return 1;
+-}
+-
+-
+ static int os_exit (lua_State *L) {
+   int status;
+   if (lua_isboolean(L, 1))
+@@ -301,14 +247,8 @@ static const luaL_Reg syslib[] = {
+   {"clock",     os_clock},
+   {"date",      os_date},
+   {"difftime",  os_difftime},
+-  {"execute",   os_execute},
+   {"exit",      os_exit},
+-  {"getenv",    os_getenv},
+-  {"remove",    os_remove},
+-  {"rename",    os_rename},
+-  {"setlocale", os_setlocale},
+   {"time",      os_time},
+-  {"tmpname",   os_tmpname},
+   {NULL, NULL}
+ };
+ 
+-- 
+2.50.0
+

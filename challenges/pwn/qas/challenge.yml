@@ -1,0 +1,25 @@
+name: "QAS"
+author: "richard"
+category: pwn
+description: |-
+  Since we are so behind on adopting "AI", corporate has decided to
+  pivot to "quantum". They mandated we "quantumfy" our tech
+  stack. Please review our latest authentication protocol.
+
+  `ncat --ssl qas.chal.uiuc.tf 1337`
+
+  **author**: richard
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{qu4ntum_0v3rfl0w_2d5ad975653b8f29}
+tags:
+  - pwn
+files:
+  - challenge/handout.tar.gz
+state: visible
+version: "0.1"

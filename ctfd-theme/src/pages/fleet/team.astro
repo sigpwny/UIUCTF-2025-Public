@@ -1,0 +1,11 @@
+---
+import Layout from '@/layouts/Base.astro';
+import TeamInfo from '@/components/TeamInfo.svelte';
+---
+<Layout
+  title="Team Info"
+>
+  <section id="team-info" class="max-w-4xl panel flex flex-col grow overflow-y-scroll custom-scrollbar">
+    <TeamInfo publicOnly={true} client:load />
+  </section>
+</Layout>

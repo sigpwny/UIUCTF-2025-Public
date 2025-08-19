@@ -1,0 +1,26 @@
+name: emacsjail
+author: George
+category: misc
+description: |
+  > Mom, can we have SBCL?
+  > No, we have SBCL at home.
+  > SBCL at home:
+
+  `ncat --ssl emacsjail.chal.uiuc.tf 1337`
+
+  **author**: George
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{h3r3s_s0me_4dv1c3_d0nt_u53_emacs}
+files:
+  - challenge/entry.sh
+  - challenge/challenge.el
+  - challenge/Dockerfile
+  - challenge/nsjail.cfg
+state: visible
+version: "0.1"

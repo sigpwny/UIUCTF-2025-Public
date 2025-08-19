@@ -1,0 +1,24 @@
+#!/bin/sh
+# Copyright 2021-2025 Google LLC.
+# SPDX-License-Identifier: MIT
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+set -x
+
+mount -n -t proc -o nosuid,noexec,nodev proc /proc/
+
+mkdir -p /dev /sys /etc
+
+mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
+mount -n -t sysfs -o nosuid,noexec,nodev sys /sys
+mount -n -t tmpfs -o mode=1777 tmpfs /tmp
+
+mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+
+efi-updatevar -f /KEK.auth KEK
+efi-updatevar -f /db.auth db
+efi-updatevar -f /PK.auth PK
+
+sync
+poweroff -f

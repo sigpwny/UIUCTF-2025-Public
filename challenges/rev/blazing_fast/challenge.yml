@@ -1,0 +1,26 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: blazing fast
+author: CBCicada
+category: rev
+description: |-
+  This binary runs blazing fast, but can you see through and find the flag?
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Talbot-Plateau_disk.png/500px-Talbot-Plateau_disk.png">
+
+  **author**: CBCicada
+value: 500
+type: dynamic
+tags:
+  - medium
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{vdma_f0r_th3_w1n_xsuOrKj2BAIACt2}
+files:
+  - blazing_fast
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

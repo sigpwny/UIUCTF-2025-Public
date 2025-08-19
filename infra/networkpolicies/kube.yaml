@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: uiuctf-egress-k8s-api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: uiuctf-egress-k8s-api
+spec:
+  podSelector:
+    matchLabels:
+      uiuctf-egress: k8s-api
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 172.16.0.34/32
+      ports:
+        - protocol: TCP
+          port: 443
+  policyTypes:
+    - Egress

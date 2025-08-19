@@ -1,0 +1,64 @@
+---
+import Avatar from "./Avatar.astro";
+import IconLink from "@/components/Icons/PixelarticonsLink.svelte";
+
+const { profile, showFull } = Astro.props;
+---
+<div
+  class="flex flex-col p-4 gap-2 lg:gap-4 rounded-xl isolate overflow-hidden bg-surface-100 border-surface-150 border-2"
+>
+  <div class="flex flex-col gap-2 lg:flex-row lg:gap-4">
+    {
+      profile?.profile_image ? (
+        <div class="w-32 h-32 mx-auto lg:mx-0">
+          <Avatar profile={profile} />
+        </div>
+      ) : null
+    }
+    <div class="lg:self-center">
+      {
+        profile?.name ? (
+          <p class="2xl:text-3xl text-2xl font-bold m-0 font-display-mono">
+            {profile.name}
+            {profile?.pronouns ? (
+              <span class="inline-flex flex-row gap-1 align-middle font-mono font-normal text-sm px-1 m-0 rounded-md bg-surface-200 max-h-fit max-w-fit select-none">
+                {profile.pronouns}
+              </span>
+            ) : null}
+          </p>
+        ) : null
+      }
+      <div class="flex flex-row items-center gap-2">
+        {
+          profile?.handle ? (
+            <p class="font-mono m-0 italic">@{profile.handle}</p>
+          ) : null
+        }
+        {
+          profile?.links ? (
+            <div class="flex flex-row items-center gap-2 select-none">
+              {profile.links.map((link: string) => {
+                if (link == undefined || link === "") return null;
+                return (
+                  <a
+                    href={link}
+                    class="flex items-center justify-center size-6 font-xl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconLink />
+                  </a>
+                );
+              })}
+            </div>
+          ) : null
+        }
+      </div>
+      {
+        profile?.bio ? (
+          <span class="max-w-prose text-center">{profile.bio}</span>
+        ) : null
+      }
+    </div>
+  </div>
+</div>

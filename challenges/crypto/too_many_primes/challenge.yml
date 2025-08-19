@@ -1,0 +1,25 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: too many primes
+author: epistemologist
+category: crypto
+description: |-
+  Normal RSA uses two primes - that's too few in my opinion, so I've added some more.
+
+  **author**: epistemologist
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{D0nt_U5e_Cons3cUt1vE_PriMeS}
+files:
+  - chal.py
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

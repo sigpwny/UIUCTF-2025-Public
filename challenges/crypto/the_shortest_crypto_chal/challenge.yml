@@ -1,0 +1,25 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: the shortest crypto chal
+author: epistemologist
+category: crypto
+description: |-
+  I've designed the shortest crypto challenge - can you find the flag?
+
+  **author**: epistemologist
+value: 500
+type: dynamic
+tags:
+  - hard
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{D1oPh4nTine__Destr0yer__}
+files:
+  - chal.py
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

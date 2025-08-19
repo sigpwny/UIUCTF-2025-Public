@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket Submitted - Black Hole Ticketing Services</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // Store ticket in browser localStorage
+        const ticketData = {
+            id: {{ ticket_data.id | tojson }},
+            timestamp: {{ ticket_data.timestamp | tojson }},
+            from: {{ ticket_data.from | tojson }},
+            subject: {{ ticket_data.subject | tojson }},
+            body: {{ ticket_data.body | tojson }},
+            status: {{ ticket_data.status | tojson }}
+        };
+        
+        try {
+            let tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+            tickets.push(ticketData);
+            
+            // Store back to localStorage
+            localStorage.setItem('tickets', JSON.stringify(tickets));
+            
+            console.log('Ticket stored successfully, redirecting in 2 seconds...');
+            
+            // Redirect to tickets page after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/tickets';
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Error storing ticket:', error);
+            // Still redirect even if storage fails
+            setTimeout(() => {
+                window.location.href = '/tickets';
+            }, 2000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/tickets">View Tickets</a>
+        </div>
+        
+        <h1>✅ Ticket Submitted Successfully!</h1>
+        
+        <div class="ticket">
+            <h3>Your Ticket Details:</h3>
+            <p><strong>Ticket ID:</strong> {{ ticket_data.id }}</p>
+            <p><strong>From:</strong> {{ ticket_data.from }}</p>
+            <p><strong>Subject:</strong> {{ ticket_data.subject }}</p>
+            <p><strong>Message:</strong> {{ ticket_data.body }}</p>
+        </div>
+        
+        <div class="status">
+            📡 Your ticket has been sent to the IT department for processing...
+        </div>
+        
+        <p style="text-align: center;">Redirecting to tickets page in 2 seconds...</p>
+        
+        <a href="/tickets" class="back-link">→ View My Tickets</a>
+    </div>
+</body>
+</html>

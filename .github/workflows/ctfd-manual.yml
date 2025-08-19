@@ -1,0 +1,40 @@
+name: CTFd Sync (Manual)
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      # https://github.com/actions/checkout/issues/270
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install ctfcli
+        run: |
+          python -m pip install --upgrade pip
+          pip install ctfcli
+      - name: Decrypt repository secrets
+        run: |
+          sudo apt install -y git-crypt
+          git-crypt unlock ./git-crypt-key
+      - name: Sync challenges to CTFd
+        run: |
+          shopt -s globstar
+          BASE_DIR=$GITHUB_WORKSPACE/challenges
+          echo "[*] Starting sync for challenges in: $BASE_DIR"
+          for chal_dir in $BASE_DIR/**/challenge.yml; do 
+            echo "[*] Syncing challenge: $chal_dir"
+            # try installing first, if already exists, sync will update it
+            ctf challenge install $chal_dir
+            ctf challenge sync $chal_dir
+            if [ $? == 1 ]; then
+              echo "::warning::Error syncing challenge $chal_dir"
+            fi
+            ctf challenge install $chal_dir
+          done
+        shell: bash --noprofile --norc {0}

@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/*
+:root {
+  --rgb-surface-000: 0 0 0;
+  --rgb-surface-050: 17 17 17;
+  --rgb-surface-100: 34 34 34;
+  --rgb-surface-150: 51 51 51;
+  --rgb-surface-200: 68 68 68;
+  --rgb-surface-250: 85 85 85;
+  --rgb-surface-300: 102 102 102
+  --rgb-text: 255 255 255;
+}
+*/
+
+@theme static {
+  --color-surface-000: rgb(0 0 0);        /* #000000 */
+  --color-surface-050: rgb(17 17 17);     /* #111111 */
+  --color-surface-100: rgb(34 34 34);     /* #222222 */
+  --color-surface-150: rgb(51 51 51);     /* #333333 */
+  --color-surface-200: rgb(68 68 68);     /* #444444 */
+  --color-surface-250: rgb(85 85 85);     /* #555555 */
+  --color-surface-300: rgb(102 102 102);  /* #666666 */
+  --color-text: rgb(255 255 255);         /* #ffffff */
+
+  --color-primary: rgb(0 123 255);        /* #007bff */
+  --color-secondary: rgb(108 117 125);    /* #6c757d */
+
+  --color-planet-red: red;
+  --color-planet-orange: orange;
+  --color-planet-yellow: yellow;
+  --color-planet-green: green;
+  --color-planet-blue: blue;
+  --color-planet-purple: purple;
+
+  --color-category-pwn: var(--color-planet-red);
+  --color-category-rev: var(--color-planet-orange);
+  --color-category-crypto: var(--color-planet-yellow);
+  --color-category-misc: var(--color-planet-green);
+  --color-category-web: var(--color-planet-blue);
+  --color-category-osint: var(--color-planet-purple);
+
+  --font-display-mono: 'Monaspace Krypton', monospace;
+}
+
+html {
+  overflow-x: hidden;
+  /* overflow-y: scroll; */
+}
+
+body {
+  background-color: var(--color-surface-000);
+  color: var(--color-text);
+  height: 100%;
+  width: 100%;
+}
+
+.panel {
+  @apply bg-surface-100/50 backdrop-blur-md p-4;
+}
+
+.scrollbar-gutter {
+  scrollbar-gutter: stable;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-text);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-surface-300);
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+.custom-scrollbar {
+  -ms-overflow-style: auto;
+  scrollbar-color: var(--color-text) transparent;
+  scrollbar-width: thin;
+}
+
+.light.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: black;
+  border-radius: 4px;
+}
+.custom-scrollbar.light::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-surface-300);
+}
+.light.custom-scrollbar {
+  -ms-overflow-style: auto;
+  scrollbar-color: black transparent;
+  scrollbar-width: thin;
+}

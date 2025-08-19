@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}SIGPWNY Shipping Bay{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "panel-bg": "#C0C0C0",
+              "panel-border": "#808080",
+              "panel-light": "#E0E0E0",
+              "panel-dark": "#404040",
+              "accent-blue": "#0066CC",
+              "accent-teal": "#008B8B",
+              "text-primary": "#000080",
+              "text-secondary": "#404040",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+        font-family: Tahoma, Arial, sans-serif;
+        font-size: 14px;
+      }
+
+      .panel {
+        background: #c0c0c0;
+        border: 2px outset #c0c0c0;
+        box-shadow: inset 1px 1px 0 #e0e0e0, inset -1px -1px 0 #808080;
+      }
+
+      .panel-inset {
+        border: 2px inset #c0c0c0;
+        background: #f0f0f0;
+        box-shadow: inset -1px -1px 0 #e0e0e0, inset 1px 1px 0 #808080;
+      }
+
+      .btn-retro {
+        background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+        border: 2px outset #c0c0c0;
+        font-weight: bold;
+        color: #000080;
+        text-shadow: 1px 1px 0 #ffffff;
+        cursor: pointer;
+      }
+
+      .btn-retro:hover {
+        background: linear-gradient(to bottom, #f0f0f0 0%, #d0d0d0 100%);
+      }
+
+      .btn-retro:active {
+        border: 2px inset #c0c0c0;
+        background: linear-gradient(to bottom, #b0b0b0 0%, #d0d0d0 100%);
+      }
+
+      .form-control {
+        border: 2px inset #c0c0c0;
+        background: white;
+        font-family: Tahoma, Arial, sans-serif;
+      }
+
+      .form-control:focus {
+        outline: none;
+        box-shadow: inset -1px -1px 0 #e0e0e0, inset 1px 1px 0 #808080,
+          0 0 0 2px #0066cc;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+        border: 1px solid #404040;
+      }
+
+      .status-in-transit {
+        background-color: #32cd32;
+      }
+      .status-preparing {
+        background-color: #ffd700;
+      }
+      .status-delivered {
+        background-color: #4169e1;
+      }
+
+      .priority-high {
+        color: #dc143c;
+        font-weight: bold;
+      }
+      .priority-medium {
+        color: #ff8c00;
+        font-weight: bold;
+      }
+      .priority-low {
+        color: #228b22;
+      }
+      .priority-critical {
+        color: #8b0000;
+        font-weight: bold;
+        text-decoration: underline;
+      }
+
+      .shipment-card {
+        background: white;
+        border: 2px outset #c0c0c0;
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+      <header class="panel p-4 mb-6 rounded">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-text-primary mb-1">
+              SIGPWNY SHIPPING BAY
+            </h1>
+            <p class="text-text-secondary text-sm">
+              Interplanetary Cargo Management System v2.087
+            </p>
+          </div>
+          <div class="text-right text-sm">
+            <div class="text-text-secondary">
+              System Status:
+              <span class="text-green-700 font-bold">OPERATIONAL</span>
+            </div>
+            <div class="text-text-secondary">Stardate: 2087.203</div>
+          </div>
+        </div>
+      </header>
+
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

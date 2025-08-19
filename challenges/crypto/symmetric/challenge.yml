@@ -1,0 +1,26 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: symmetric
+author: epistemologist
+category: crypto
+description: |-
+  I'm using four primes to encrypt my flag, so I'm only giving you three hints - can you decrypt the flag?
+
+  **author**: epistemologist
+value: 500
+type: dynamic
+tags:
+  - medium
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{5yMmeTRiC_P0lyS_FoRM_A_B4S15}
+files:
+  - chal.py
+  - output.txt
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

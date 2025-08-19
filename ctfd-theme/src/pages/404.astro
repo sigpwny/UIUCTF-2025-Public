@@ -1,0 +1,17 @@
+---
+import Layout from '@/layouts/Base.astro';
+import IconAlert from '@/components/Icons/PixelarticonsAlert.svelte';
+---
+
+<Layout title="404 Not Found">
+  <div class="flex flex-col items-center justify-center h-full font-mono">
+    <div class="panel flex flex-col max-w-prose items-center text-center">
+      <span class="text-4xl mb-2">
+        <IconAlert />
+      </span>
+      <h1 class="font-display-mono font-bold text-2xl mb-2">Code 404</h1>
+      <p>The page you are looking for does not exist.</p>
+      <a href="/" class="underline hover:text-surface-000 hover:bg-text">Go home</a>
+    </div>
+  </div>
+</Layout>

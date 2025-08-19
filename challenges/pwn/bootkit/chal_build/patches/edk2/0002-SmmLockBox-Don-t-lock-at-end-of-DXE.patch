@@ -1,0 +1,30 @@
+From 65df501240dc298ef4cab5d169a6281bef9a2dff Mon Sep 17 00:00:00 2001
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Sun, 29 Jun 2025 13:52:57 -0700
+Subject: [PATCH 2/2] SmmLockBox: Don't lock at end of DXE
+
+The engineers at SIGPwny Inc. wants SmmLockBox to be written by runtime.
+Given that boot scripts are executed with SMRAM closed and locked, and
+we do sufficient bound checking against SMRAM ranges, this should be
+fine, right?
+
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+---
+ MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.c b/MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.c
+index c1e15c596b..ec92b44fe1 100644
+--- a/MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.c
++++ b/MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.c
+@@ -383,7 +383,6 @@ SmmReadyToLockEventNotify (
+   IN EFI_HANDLE      Handle
+   )
+ {
+-  mLocked = TRUE;
+   return EFI_SUCCESS;
+ }
+ 
+-- 
+2.50.0
+

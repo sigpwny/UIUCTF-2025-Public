@@ -1,0 +1,23 @@
+# This file represents the base specification of your challenge. It is used by
+# other tools to install and deploy your challenge.
+# Required sections
+name: Bad Blood
+author: Emma
+category: osint
+description: |-
+  Mr. Blue Sky is just trying his best to build a following, but he's been trying to hide interactions from a particular troll! See if you can find something on that user's profile.
+
+  **author**: Emma
+value: 500
+type: dynamic
+tags:
+  - easy
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{bU7_1m_4_c4pr1c0rn_7098743}
+# This is visible by default. It takes two values: hidden, visible.
+state: visible
+version: "0.1"

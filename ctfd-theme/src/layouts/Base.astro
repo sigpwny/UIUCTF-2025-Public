@@ -1,0 +1,47 @@
+---
+import Head from '@/components/Head.astro';
+import Navbar from '@/components/Header/Navbar.svelte';
+import { type HeadProps } from '@/components/Head.astro';
+import IconAlert from '@/components/Icons/PixelarticonsAlert.svelte';
+import StarSystemScene from '@/components/StarSystem/Scene.svelte';
+
+import '@/styles/global.css';
+import '@fontsource/monaspace-krypton';
+import 'toastify-js/src/toastify.css';
+
+type LayoutProps = HeadProps & {
+  disableCountdown?: boolean;
+};
+
+const {disableCountdown, ...props}: LayoutProps = Astro.props;
+const currentUrl = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en" transition:animate="none">
+  <Head
+    {...props}
+  />
+  <body>
+    <div class="absolute">
+      <!-- <slot name="background" /> -->
+      <div class="hidden md:flex h-screen w-screen">
+        <StarSystemScene client:load transition:persist />
+      </div>
+    </div>
+    <div class="flex flex-col pointer-events-none absolute h-screen max-h-screen w-screen">
+      <header class="pointer-events-auto sticky m-4 top-0 z-10">
+        <noscript>
+          <div class="flex flex-row items-center justify-center gap-2 bg-red-600 text-white p-2 text-center text-with-links pointer-events-auto">
+            <IconAlert />
+            JavaScript is required for this site to function.
+          </div>
+        </noscript>
+        <Navbar current_url={currentUrl} disable_countdown={disableCountdown} client:load transition:persist />
+      </header>
+      <main class="pointer-events-none *:pointer-events-auto flex flex-col grow mx-4 mb-4 overflow-hidden">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

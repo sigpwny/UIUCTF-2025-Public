@@ -1,0 +1,187 @@
+diff --git a/CTFd/api/v1/teams.py b/CTFd/api/v1/teams.py
+index 71f95fff..c0327480 100644
+--- a/CTFd/api/v1/teams.py
++++ b/CTFd/api/v1/teams.py
+@@ -21,7 +21,9 @@ from CTFd.models import Awards, Submissions, Teams, Unlocks, Users, db
+ from CTFd.schemas.awards import AwardSchema
+ from CTFd.schemas.submissions import SubmissionSchema
+ from CTFd.schemas.teams import TeamSchema
++from CTFd.schemas.users import UserSchema
+ from CTFd.utils import get_config
++from CTFd.utils.crypto import verify_password
+ from CTFd.utils.decorators import admins_only, authed_only, require_team
+ from CTFd.utils.decorators.modes import require_team_mode
+ from CTFd.utils.decorators.visibility import (
+@@ -29,7 +31,7 @@ from CTFd.utils.decorators.visibility import (
+     check_score_visibility,
+ )
+ from CTFd.utils.helpers.models import build_model_filters
+-from CTFd.utils.user import get_current_team, get_current_user_type, is_admin
++from CTFd.utils.user import get_current_team, get_current_user, get_current_user_type, get_current_user_attrs, is_admin
+ 
+ teams_namespace = Namespace("teams", description="Endpoint to retrieve Teams")
+ 
+@@ -297,6 +299,97 @@ class TeamPrivate(Resource):
+         response.data["score"] = team.get_score(admin=True)
+         return {"success": True, "data": response.data}
+ 
++    @authed_only
++    @teams_namespace.doc(
++        description="Endpoint to create or join a Team object",
++        responses={
++            200: ("Success", "APISimpleSuccessResponse"),
++            400: (
++                "An error occured processing the provided or stored data",
++                "APISimpleErrorResponse",
++            ),
++            403: ("Forbidden", "APISimpleErrorResponse"),
++        },
++    )
++    def post(self):
++        user = get_current_user_attrs()
++
++        if user.team_id:
++            return {"success": False, "errors": {"name": ["You are already in a team. You cannot join another."]}}, 403
++
++        data = request.get_json()
++        method = data.pop("method", None)
++        teamname = data.get("name", "").strip()
++        passphrase = data.get("password", "").strip()
++
++        if method == "create":
++            if bool(get_config("team_creation", default=True)) is False:
++                return {"success": False, "errors": {"name": ["Team creation is currently disabled. Please join an existing team."]}}, 403
++            num_teams_limit = int(get_config("num_teams", default=0))
++            num_teams = Teams.query.filter_by(banned=False, hidden=False).count()
++            if num_teams_limit and num_teams >= num_teams_limit:
++                return {"success": False, "errors": {"name": [f"Reached the maximum number of teams ({num_teams_limit}). Please join an existing team."]}}, 403
++
++            user = get_current_user()
++
++            existing_team = Teams.query.filter_by(name=teamname).first()
++            if existing_team:
++                return {"success": False, "errors": {"name": ["A team with that name already exists. Please choose a different name."]}}, 400
++            if not teamname:
++                return {"success": False, "errors": {"name": ["That team name is invalid."]}}, 400
++            if not passphrase:
++                return {"success": False, "errors": {"password": ["That team password is invalid."]}}, 400
++
++            # Hide the created team if the creator is an admin
++            hidden = False
++            if user.type == "admin":
++                hidden = True
++
++            team = Teams(
++                name=teamname,
++                password=passphrase,
++                captain_id=user.id,
++                hidden=hidden,
++            )
++
++            db.session.add(team)
++            db.session.commit()
++
++            user.team_id = team.id
++            db.session.commit()
++
++            clear_user_session(user_id=user.id)
++            clear_team_session(team_id=team.id)
++            clear_standings()
++            clear_challenges()
++
++            db.session.close()
++
++            return {"success": True}
++        elif method == "join":
++            team = Teams.query.filter_by(name=teamname).first()
++            if team and verify_password(passphrase, team.password):
++                team_size_limit = int(get_config("team_size_limit", default=0))
++                if team_size_limit and len(team.members) >= team_size_limit:
++                    return {"success": False, "errors": {"name": [f"{team.name} has already reached the team size limit of {team_size_limit}."]}}, 400
++
++                user = get_current_user()
++                user.team_id = team.id
++                db.session.commit()
++
++                if len(team.members) == 1:
++                    team.captain_id = user.id
++                    db.session.commit()
++
++                clear_user_session(user_id=user.id)
++                clear_team_session(team_id=team.id)
++
++                return {"success": True}
++            else:
++                return {"success": False, "errors": {"name": ["That team information is incorrect."]}}, 400
++        else:
++            return {"success": False, "errors": {"method": ["Invalid method specified."]}}, 400
++
+     @authed_only
+     @require_team
+     @teams_namespace.doc(
+@@ -406,6 +499,30 @@ class TeamPrivate(Resource):
+ class TeamPrivateMembers(Resource):
+     method_decorators = [require_team_mode]
+ 
++    @authed_only
++    @require_team
++    def get(self):
++        team = get_current_team()
++
++        view = "admin" if is_admin() else "user"
++        schema = TeamSchema(view=view)
++        response = schema.dump(team)
++
++        if response.errors:
++            return {"success": False, "errors": response.errors}, 400
++
++        members = response.data.get("members")
++        expanded_members = []
++        for member_id in members:
++            user = Users.query.filter_by(id=member_id).first_or_404()
++            dumped_user = UserSchema(view=view).dump(user)._asdict()["data"]
++            solves = SubmissionSchema(view=view, many=True).dump(user.get_solves(admin=is_admin()))._asdict()["data"]
++            user_points = sum([s["challenge"]["value"] for s in solves])
++            dumped_user["score"] = user_points
++            expanded_members.append(dumped_user)
++
++        return {"success": True, "data": expanded_members}
++
+     @authed_only
+     @require_team
+     def post(self):
+@@ -429,10 +546,14 @@ class TeamPrivateMembers(Resource):
+ class TeamMembers(Resource):
+     method_decorators = [require_team_mode]
+ 
+-    @admins_only
++    @check_account_visibility
++    @check_score_visibility
+     def get(self, team_id):
+         team = Teams.query.filter_by(id=team_id).first_or_404()
+ 
++        if (team.banned or team.hidden) and is_admin() is False:
++            abort(404)
++
+         view = "admin" if is_admin() else "user"
+         schema = TeamSchema(view=view)
+         response = schema.dump(team)
+@@ -441,8 +562,16 @@ class TeamMembers(Resource):
+             return {"success": False, "errors": response.errors}, 400
+ 
+         members = response.data.get("members")
+-
+-        return {"success": True, "data": members}
++        expanded_members = []
++        for member_id in members:
++            user = Users.query.filter_by(id=member_id).first_or_404()
++            dumped_user = UserSchema(view=view).dump(user)._asdict()["data"]
++            solves = SubmissionSchema(view=view, many=True).dump(user.get_solves(admin=is_admin()))._asdict()["data"]
++            user_points = sum([s["challenge"]["value"] for s in solves])
++            dumped_user["score"] = user_points
++            expanded_members.append(dumped_user)
++
++        return {"success": True, "data": expanded_members}
+ 
+     @admins_only
+     def post(self, team_id):

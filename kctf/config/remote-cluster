@@ -1,0 +1,8 @@
+CLUSTER_TYPE=gce
+PROJECT=dotted-forest-314903
+ZONE=us-central1-a
+REGISTRY=us-central1-docker.pkg.dev
+ARTIFACT_REPOSITORY=uiuctf-2025
+CLUSTER_NAME=kctf-cluster
+DOMAIN_NAME=chal.uiuc.tf
+EMAIL_ADDRESS=hello@sigpwny.com

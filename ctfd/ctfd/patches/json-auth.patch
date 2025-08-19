@@ -1,0 +1,519 @@
+diff --git a/CTFd/auth.py b/CTFd/auth.py
+index 80ef9f52..b4356049 100644
+--- a/CTFd/auth.py
++++ b/CTFd/auth.py
+@@ -1,7 +1,7 @@
+ import requests
+ from flask import Blueprint, abort
+ from flask import current_app as app
+-from flask import redirect, render_template, request, session, url_for
++from flask import jsonify, redirect, render_template, request, session, url_for
+ 
+ from CTFd.cache import clear_team_session, clear_user_session
+ from CTFd.exceptions.email import (
+@@ -39,6 +39,8 @@ auth = Blueprint("auth", __name__)
+ def confirm(data=None):
+     if not get_config("verify_emails"):
+         # If the CTF doesn't care about confirming email addresses then redierct to challenges
++        if request.content_type == "application/json":
++            return jsonify({"success": True, "redirect": "challenges.listing"})
+         return redirect(url_for("challenges.listing"))
+ 
+     # User is confirming email account
+@@ -46,6 +48,11 @@ def confirm(data=None):
+         try:
+             user_email = verify_email_confirm_token(data)
+         except (UserConfirmTokenInvalidException):
++            if request.content_type == "application/json":
++                return jsonify({
++                    "success": False,
++                    "errors": ["Your confirmation link is invalid, please generate a new one"]
++                })
+             return render_template(
+                 "confirm.html",
+                 errors=["Your confirmation link is invalid, please generate a new one"],
+@@ -53,6 +60,8 @@ def confirm(data=None):
+ 
+         user = Users.query.filter_by(email=user_email).first_or_404()
+         if user.verified:
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "redirect": "views.settings"})
+             return redirect(url_for("views.settings"))
+ 
+         user.verified = True
+@@ -64,18 +73,27 @@ def confirm(data=None):
+         db.session.commit()
+         remove_email_confirm_token(data)
+         clear_user_session(user_id=user.id)
+-        email.successful_registration_notification(user.email)
++        # email.successful_registration_notification(user.email)
+         db.session.close()
++        if request.content_type == "application/json":
++            if current_user.authed():
++                return jsonify({"success": True, "redirect": "challenges.listing"})
++            return jsonify({"success": True, "redirect": "auth.login"})
++
+         if current_user.authed():
+             return redirect(url_for("challenges.listing"))
+         return redirect(url_for("auth.login"))
+ 
+     # User is trying to start or restart the confirmation flow
+     if current_user.authed() is False:
++        if request.content_type == "application/json":
++            return jsonify({"success": False, "redirect": "auth.login"})
+         return redirect(url_for("auth.login"))
+ 
+     user = Users.query.filter_by(id=session["id"]).first_or_404()
+     if user.verified:
++        if request.content_type == "application/json":
++            return jsonify({"success": True, "redirect": "views.settings"})
+         return redirect(url_for("views.settings"))
+ 
+     if data is None:
+@@ -87,11 +105,18 @@ def confirm(data=None):
+                 format="[{date}] {ip} - {name} initiated a confirmation email resend",
+                 name=user.name,
+             )
++            if request.content_type == "application/json":
++                return jsonify({
++                    "success": True,
++                    "message": f"Confirmation email sent to {user.email}!"
++                })
+             return render_template(
+                 "confirm.html", infos=[f"Confirmation email sent to {user.email}!"]
+             )
+         elif request.method == "GET":
+             # User has been directed to the confirm page
++            if request.content_type == "application/json":
++                return jsonify({"success": True})
+             return render_template("confirm.html")
+ 
+ 
+@@ -100,6 +125,8 @@ def confirm(data=None):
+ @ratelimit(method="POST", limit=10, interval=60)
+ def reset_password(data=None):
+     if config.can_send_mail() is False:
++        if request.content_type == "application/json":
++            return jsonify({"success": False, "errors": ["This CTF is not configured to send email. Please contact an organizer to have your password reset."]})
+         return render_template(
+             "reset_password.html",
+             errors=[
+@@ -113,26 +140,40 @@ def reset_password(data=None):
+         try:
+             email_address = verify_reset_password_token(data)
+         except (UserResetPasswordTokenInvalidException):
++            if request.content_type == "application/json":
++                return jsonify({
++                    "success": False,
++                    "errors": ["Your reset link is invalid, please generate a new one"]
++                })
+             return render_template(
+                 "reset_password.html",
+                 errors=["Your reset link is invalid, please generate a new one"],
+             )
+ 
+         if request.method == "GET":
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "mode": "set"})
+             return render_template("reset_password.html", mode="set")
++            
+         if request.method == "POST":
+-            password = request.form.get("password", "").strip()
++            if request.content_type == "application/json":
++                password = request.json.get("password", "").strip()
++            else:
++                password = request.form.get("password", "").strip()
+             user = Users.query.filter_by(email=email_address).first_or_404()
+             if user.oauth_id:
++                message = "Your account was registered via an authentication provider and does not have an associated password. Please login via your authentication provider."
++                if request.content_type == "application/json":
++                    return jsonify({"success": False, "message": message})
+                 return render_template(
+                     "reset_password.html",
+-                    infos=[
+-                        "Your account was registered via an authentication provider and does not have an associated password. Please login via your authentication provider."
+-                    ],
++                    infos=[message],
+                 )
+ 
+             pass_short = len(password) == 0
+             if pass_short:
++                if request.content_type == "application/json":
++                    return jsonify({"success": False, "errors": ["Please pick a longer password"]})
+                 return render_template(
+                     "reset_password.html", errors=["Please pick a longer password"]
+                 )
+@@ -148,38 +189,48 @@ def reset_password(data=None):
+             )
+             db.session.close()
+             email.password_change_alert(user.email)
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "redirect": "auth.login"})
+             return redirect(url_for("auth.login"))
+ 
+     if request.method == "POST":
+-        email_address = request.form["email"].strip()
++        if request.content_type == "application/json":
++            email_address = request.json.get("email", "").strip()
++        else:
++            email_address = request.form["email"].strip()
+         user = Users.query.filter_by(email=email_address).first()
+ 
+         get_errors()
+ 
+         if not user:
++            message = "If that account exists you will receive an email, please check your inbox"
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "message": message})
+             return render_template(
+                 "reset_password.html",
+-                infos=[
+-                    "If that account exists you will receive an email, please check your inbox"
+-                ],
++                infos=[message],
+             )
+ 
+         if user.oauth_id:
++            message = "The email address associated with this account was registered via an authentication provider and does not have an associated password. Please login via your authentication provider."
++            if request.content_type == "application/json":
++                return jsonify({"success": False, "message": message})
+             return render_template(
+                 "reset_password.html",
+-                infos=[
+-                    "The email address associated with this account was registered via an authentication provider and does not have an associated password. Please login via your authentication provider."
+-                ],
++                infos=[message],
+             )
+ 
+         email.forgot_password(email_address)
+ 
++        message = "If that account exists you will receive an email, please check your inbox"
++        if request.content_type == "application/json":
++            return jsonify({"success": True, "message": message})
+         return render_template(
+             "reset_password.html",
+-            infos=[
+-                "If that account exists you will receive an email, please check your inbox"
+-            ],
++            infos=[message],
+         )
++    if request.content_type == "application/json":
++        return jsonify({"success": True})
+     return render_template("reset_password.html")
+ 
+ 
+@@ -189,26 +240,44 @@ def reset_password(data=None):
+ def register():
+     errors = get_errors()
+     if current_user.authed():
++        if request.content_type == "application/json":
++            return jsonify({"success": True, "redirect": "challenges.listing"})
+         return redirect(url_for("challenges.listing"))
+ 
+     num_users_limit = int(get_config("num_users", default=0))
+     num_users = Users.query.filter_by(banned=False, hidden=False).count()
+     if num_users_limit and num_users >= num_users_limit:
++        if request.content_type == "application/json":
++            return jsonify({
++                "success": False,
++                "error": f"Reached the maximum number of users ({num_users_limit})."
++            }), 403
+         abort(
+             403,
+             description=f"Reached the maximum number of users ({num_users_limit}).",
+         )
+ 
+     if request.method == "POST":
+-        name = request.form.get("name", "").strip()
+-        email_address = request.form.get("email", "").strip().lower()
+-        password = request.form.get("password", "").strip()
+-
+-        website = request.form.get("website")
+-        affiliation = request.form.get("affiliation")
+-        country = request.form.get("country")
+-        registration_code = str(request.form.get("registration_code", ""))
+-        bracket_id = request.form.get("bracket_id", None)
++        # Handle both JSON and form data
++        if request.content_type == "application/json":
++            data = request.json
++            name = data.get("name", "").strip()
++            email_address = data.get("email", "").strip().lower()
++            password = data.get("password", "").strip()
++            website = data.get("website")
++            affiliation = data.get("affiliation")
++            country = data.get("country")
++            registration_code = str(data.get("registration_code", ""))
++            bracket_id = data.get("bracket_id", None)
++        else:
++            name = request.form.get("name", "").strip()
++            email_address = request.form.get("email", "").strip().lower()
++            password = request.form.get("password", "").strip()
++            website = request.form.get("website")
++            affiliation = request.form.get("affiliation")
++            country = request.form.get("country")
++            registration_code = str(request.form.get("registration_code", ""))
++            bracket_id = request.form.get("bracket_id", None)
+ 
+         name_len = len(name) == 0
+         names = (
+@@ -238,7 +307,12 @@ def register():
+ 
+         entries = {}
+         for field_id, field in fields.items():
+-            value = request.form.get(f"fields[{field_id}]", "").strip()
++            if request.content_type == "application/json":
++                value = request.json.get(f"fields", {}).get(str(field_id), "")
++                if isinstance(value, str):
++                    value = value.strip()
++            else:
++                value = request.form.get(f"fields[{field_id}]", "").strip()
+             if field.required is True and (value is None or value == ""):
+                 errors.append("Please provide all required fields")
+                 break
+@@ -305,6 +379,8 @@ def register():
+             errors.append("Please provide a valid bracket")
+ 
+         if len(errors) > 0:
++            if request.content_type == "application/json":
++                return jsonify({"success": False, "errors": errors})
+             return render_template(
+                 "register.html",
+                 errors=errors,
+@@ -341,10 +417,17 @@ def register():
+ 
+                 login_user(user)
+ 
+-                if request.args.get("next") and validators.is_safe_url(
+-                    request.args.get("next")
+-                ):
+-                    return redirect(request.args.get("next"))
++                # Handle next URL for JSON requests
++                next_url = None
++                if request.content_type == "application/json":
++                    next_url = request.json.get("next")
++                else:
++                    next_url = request.args.get("next")
++
++                if next_url and validators.is_safe_url(next_url):
++                    if request.content_type == "application/json":
++                        return jsonify({"success": True, "redirect": next_url})
++                    return redirect(next_url)
+ 
+                 if config.can_send_mail() and get_config(
+                     "verify_emails"
+@@ -357,6 +440,8 @@ def register():
+                     )
+                     email.verify_email_address(user.email)
+                     db.session.close()
++                    if request.content_type == "application/json":
++                        return jsonify({"success": True, "redirect": "auth.confirm"})
+                     return redirect(url_for("auth.confirm"))
+                 else:  # Don't care about confirming users
+                     if (
+@@ -373,10 +458,16 @@ def register():
+         db.session.close()
+ 
+         if is_teams_mode():
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "redirect": "teams.private"})
+             return redirect(url_for("teams.private"))
+ 
++        if request.content_type == "application/json":
++            return jsonify({"success": True, "redirect": "challenges.listing"})
+         return redirect(url_for("challenges.listing"))
+     else:
++        if request.content_type == "application/json":
++            return jsonify({"success": True})
+         return render_template("register.html", errors=errors)
+ 
+ 
+@@ -385,7 +476,13 @@ def register():
+ def login():
+     errors = get_errors()
+     if request.method == "POST":
+-        name = request.form["name"]
++        # Handle both JSON and form data
++        if request.content_type == "application/json":
++            name = request.json.get("name", "")
++            password = request.json.get("password", "")
++        else:
++            name = request.form["name"]
++            password = request.form["password"]
+ 
+         # Check if the user submitted an email address or a team name
+         if validators.validate_email(name) is True:
+@@ -395,23 +492,33 @@ def login():
+ 
+         if user:
+             if user.password is None:
+-                errors.append(
+-                    "Your account was registered with a 3rd party authentication provider. "
+-                    "Please try logging in with a configured authentication provider."
+-                )
++                error_msg = "Your account was registered with a 3rd party authentication provider. Please try logging in with a configured authentication provider."
++                errors.append(error_msg)
++                if request.content_type == "application/json":
++                    return jsonify({"success": False, "errors": errors})
+                 return render_template("login.html", errors=errors)
+ 
+-            if user and verify_password(request.form["password"], user.password):
++            if user and verify_password(password, user.password):
+                 session.regenerate()
+ 
+                 login_user(user)
+                 log("logins", "[{date}] {ip} - {name} logged in", name=user.name)
+ 
+                 db.session.close()
+-                if request.args.get("next") and validators.is_safe_url(
+-                    request.args.get("next")
+-                ):
+-                    return redirect(request.args.get("next"))
++                # Handle next URL for JSON requests
++                next_url = None
++                if request.content_type == "application/json":
++                    next_url = request.json.get("next")
++                else:
++                    next_url = request.args.get("next")
++
++                if next_url and validators.is_safe_url(next_url):
++                    if request.content_type == "application/json":
++                        return jsonify({"success": True, "redirect": next_url})
++                    return redirect(next_url)
++
++                if request.content_type == "application/json":
++                    return jsonify({"success": True, "redirect": "challenges.listing"})
+                 return redirect(url_for("challenges.listing"))
+ 
+             else:
+@@ -423,15 +530,21 @@ def login():
+                 )
+                 errors.append("Your username or password is incorrect")
+                 db.session.close()
++                if request.content_type == "application/json":
++                    return jsonify({"success": False, "errors": errors})
+                 return render_template("login.html", errors=errors)
+         else:
+             # This user just doesn't exist
+             log("logins", "[{date}] {ip} - submitted invalid account information")
+             errors.append("Your username or password is incorrect")
+             db.session.close()
++            if request.content_type == "application/json":
++                return jsonify({"success": False, "errors": errors})
+             return render_template("login.html", errors=errors)
+     else:
+         db.session.close()
++        if request.content_type == "application/json":
++            return jsonify({"success": True})
+         return render_template("login.html", errors=errors)
+ 
+ 
+@@ -451,16 +564,20 @@ def oauth_login():
+     client_id = get_app_config("OAUTH_CLIENT_ID") or get_config("oauth_client_id")
+ 
+     if client_id is None:
++        error_msg = "OAuth Settings not configured. Ask your CTF administrator to configure MajorLeagueCyber integration."
+         error_for(
+             endpoint="auth.login",
+-            message="OAuth Settings not configured. "
+-            "Ask your CTF administrator to configure MajorLeagueCyber integration.",
++            message=error_msg,
+         )
++        if request.content_type == "application/json":
++            return jsonify({"success": False, "error": error_msg, "redirect": "auth.login"})
+         return redirect(url_for("auth.login"))
+ 
+     redirect_url = "{endpoint}?response_type=code&client_id={client_id}&scope={scope}&state={state}".format(
+         endpoint=endpoint, client_id=client_id, scope=scope, state=session["nonce"]
+     )
++    if request.content_type == "application/json":
++        return jsonify({"success": True, "redirect": redirect_url})
+     return redirect(redirect_url)
+ 
+ 
+@@ -472,6 +589,8 @@ def oauth_redirect():
+     if session["nonce"] != state:
+         log("logins", "[{date}] {ip} - OAuth State validation mismatch")
+         error_for(endpoint="auth.login", message="OAuth State validation mismatch.")
++        if request.content_type == "application/json":
++            return jsonify({"success": False, "error": "OAuth State validation mismatch.", "redirect": "auth.login"})
+         return redirect(url_for("auth.login"))
+ 
+     if oauth_code:
+@@ -518,6 +637,11 @@ def oauth_redirect():
+                 num_users_limit = int(get_config("num_users", default=0))
+                 num_users = Users.query.filter_by(banned=False, hidden=False).count()
+                 if num_users_limit and num_users >= num_users_limit:
++                    if request.content_type == "application/json":
++                        return jsonify({
++                            "success": False,
++                            "error": f"Reached the maximum number of users ({num_users_limit})."
++                        }), 403
+                     abort(
+                         403,
+                         description=f"Reached the maximum number of users ({num_users_limit}).",
+@@ -539,6 +663,12 @@ def oauth_redirect():
+                         endpoint="auth.login",
+                         message="Public registration is disabled. Please try again later.",
+                     )
++                    if request.content_type == "application/json":
++                        return jsonify({
++                            "success": False,
++                            "error": "Public registration is disabled. Please try again later.",
++                            "redirect": "auth.login"
++                        })
+                     return redirect(url_for("auth.login"))
+ 
+             if get_config("user_mode") == TEAMS_MODE and user.team_id is None:
+@@ -552,9 +682,12 @@ def oauth_redirect():
+                         banned=False, hidden=False
+                     ).count()
+                     if num_teams_limit and num_teams >= num_teams_limit:
++                        error_msg = f"Reached the maximum number of teams ({num_teams_limit}). Please join an existing team."
++                        if request.content_type == "application/json":
++                            return jsonify({"success": False, "error": error_msg}), 403
+                         abort(
+                             403,
+-                            description=f"Reached the maximum number of teams ({num_teams_limit}). Please join an existing team.",
++                            description=error_msg,
+                         )
+ 
+                     team = Teams(name=team_name, oauth_id=team_id, captain_id=user.id)
+@@ -569,6 +702,8 @@ def oauth_redirect():
+                         limit=team_size_limit, plural=plural
+                     )
+                     error_for(endpoint="auth.login", message=size_error)
++                    if request.content_type == "application/json":
++                        return jsonify({"success": False, "error": size_error, "redirect": "auth.login"})
+                     return redirect(url_for("auth.login"))
+ 
+                 team.members.append(user)
+@@ -582,16 +717,22 @@ def oauth_redirect():
+ 
+             login_user(user)
+ 
++            if request.content_type == "application/json":
++                return jsonify({"success": True, "redirect": "challenges.listing"})
+             return redirect(url_for("challenges.listing"))
+         else:
+             log("logins", "[{date}] {ip} - OAuth token retrieval failure")
+             error_for(endpoint="auth.login", message="OAuth token retrieval failure.")
++            if request.content_type == "application/json":
++                return jsonify({"success": False, "error": "OAuth token retrieval failure.", "redirect": "auth.login"})
+             return redirect(url_for("auth.login"))
+     else:
+         log("logins", "[{date}] {ip} - Received redirect without OAuth code")
+         error_for(
+             endpoint="auth.login", message="Received redirect without OAuth code."
+         )
++        if request.content_type == "application/json":
++            return jsonify({"success": False, "error": "Received redirect without OAuth code.", "redirect": "auth.login"})
+         return redirect(url_for("auth.login"))
+ 
+ 
+@@ -599,4 +740,6 @@ def oauth_redirect():
+ def logout():
+     if current_user.authed():
+         logout_user()
++    if request.content_type == "application/json":
++        return jsonify({"success": True, "redirect": "views.static_html"})
+     return redirect(url_for("views.static_html"))

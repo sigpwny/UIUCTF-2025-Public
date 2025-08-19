@@ -1,0 +1,137 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: uiuctf-all-egress
+spec:
+  podSelector:
+    matchLabels:
+      uiuctf-egress: all
+  egress:
+    - {}
+  policyTypes:
+    - Egress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd
+  labels:
+    app: ctfd
+spec:
+  selector:
+    matchLabels:
+      app: ctfd
+  template:
+    metadata:
+      labels:
+        app: ctfd
+        uiuctf-egress: all
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      containers:
+        - name: ctfd
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/ctfd-ctfd:8eefd9e045597e8bc0b58e3912f4c9e50a13496556647b0dcfe4ec7813eae632
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 1000m
+            limits:
+              cpu: 4000m
+          env:
+            - name: WORKERS
+              value: '9'
+            - name: REVERSE_PROXY
+              value: 'true'
+            - name: UPLOAD_PROVIDER
+              value: s3
+            - name: AWS_S3_ENDPOINT_URL
+              value: https://storage.googleapis.com
+          envFrom:
+            - secretRef:
+                name: ctfd-secrets
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 45
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+              subPath: tmp
+        - name: nginx
+          image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/ctfd-nginx:cb452a85da7d3871006a06d1f93384f1f8fcc4969fb471e95072e92a6722157e
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 45
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 512Mi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: node
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: ctfd
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ctfd
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ctfd
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd
+  labels:
+    app: ctfd
+spec:
+  selector:
+    app: ctfd
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+  loadBalancerIP: 34.60.180.22

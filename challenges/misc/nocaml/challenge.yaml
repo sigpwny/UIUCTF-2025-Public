@@ -1,0 +1,34 @@
+apiVersion: kctf.dev/v1
+kind: Challenge
+metadata:
+  name: nocaml
+spec:
+  deployed: true
+  powDifficultySeconds: 0
+  network:
+    public: false
+    ports:
+      - protocol: "TCP"
+        port: 1337
+        targetPort: 1337
+  healthcheck:
+    enabled: true
+    image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/nocaml-healthcheck:5cb99189e511ac81e1a59437c738b45714f184c2c16abf7c9db12f17acb54ac2
+  image: us-central1-docker.pkg.dev/dotted-forest-314903/uiuctf-2025/nocaml-challenge:cc50bbae6c5dfe0e9a7ddaa154d590e3eb975525cace5b95aeb7de16be991118
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: nocaml
+  labels:
+    app: nocaml
+spec:
+  entryPoints:
+    - tcp
+  routes:
+    - match: HostSNI(`nocaml.chal.uiuc.tf`)
+      services:
+        - name: nocaml
+          port: 1337
+  tls:
+    secretName: tls-cert

@@ -1,0 +1,19 @@
+#! /usr/bin/expect -f
+
+set timeout -1
+set stty_init -isig
+
+spawn -noecho ./initchal.sh
+
+expect "uiuctf-2025:/root# "
+send "echo mem > /sys/power/state\n"
+
+expect "VM suspended. Press enter to resume..."
+send "\n"
+
+expect "uiuctf-2025:/root# "
+send "poweroff -f\n"
+
+expect "reboot: Power down"
+
+wait

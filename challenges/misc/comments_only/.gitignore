@@ -1,0 +1,14 @@
+# Generated solution files
+new_solution.py
+solution_new.py
+
+# Test artifacts
+test_input.txt
+
+# Temporary files
+*.tmp
+*.zip
+__main__.py
+
+# MyPy cache
+.mypy_cache/

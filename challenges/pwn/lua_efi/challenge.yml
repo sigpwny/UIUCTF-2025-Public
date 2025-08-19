@@ -1,0 +1,33 @@
+name: "Lua.efi"
+author: "YiFei Zhu"
+category: pwn
+description: |-
+  The engineers at SIGPwny Inc. wants to retaliate against PwnySIG Inc. for finding their secrets. They found PwnySIG Inc.'s server and was able to detach its hard drive and replace the kernel with a backdoor-ed kernel.
+
+  Unfortunately, they soon discovered that the server has secure boot on, and there's no firmware setup to disable it... how would it be possible to boot this backdoor kernel? Hmm... what's this? How considerate of PwnySIG Inc. to leave a signed lua interpreter wide open. Maybe they can bypass secure boot through that?
+
+  `$ socat file:$(tty),raw,echo=0 openssl:lua-efi.chal.uiuc.tf:1337`
+
+    <details><summary>Show hint #1</summary>Feel free to use known exploits that exist in the wild to escape the
+    lua "jail", such as https://gist.github.com/corsix/49d770c7085e4b75f32939c6c076aad6</details>
+
+  **author**: YiFei Zhu
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{broken_chain_of_trust_is_a_lot_of_damage_fb61a3b1}
+tags:
+  - pwn
+  - lua
+  - uefi
+files:
+  - handouts/README
+  - handouts/chal_build.tar.zst
+  - handouts/edk2_artifacts.tar.zst
+  - handouts/run.tar.zst
+state: visible
+version: "0.1"

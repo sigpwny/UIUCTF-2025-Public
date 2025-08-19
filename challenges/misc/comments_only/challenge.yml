@@ -1,0 +1,29 @@
+name: Comments Only
+author: "n8 & arxenix"
+category: misc
+description: |-
+  Can you craft an exploit with just a comment? Note that we're using python 3.11 here.
+
+  ```py
+  # your input here
+  ```
+
+  `ncat --ssl comments-only.chal.uiuc.tf 1337`
+
+  **author**: n8 & arxenix
+value: 500
+type: dynamic
+extra:
+  initial: 500
+  decay: 75
+  minimum: 50
+flags:
+  - uiuctf{yeehaw_954b4b3814b22c0b4eecd}
+tags:
+  - python
+files:
+  - challenge/main.py
+  - challenge/Dockerfile
+  - challenge/nsjail.cfg
+state: visible
+version: "0.1"
