@@ -1,4 +1,4 @@
 Flask==2.3.3
-aiosmtpd==1.4.4
+aiosmtpd==1.4.6
 asyncio
 requests
